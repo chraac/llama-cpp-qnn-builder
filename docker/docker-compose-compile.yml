@@ -1,0 +1,43 @@
+services:
+  llama-qnn-compile:
+    platform: linux/x86_64
+    build: 
+      context: .
+      dockerfile: Dockerfile.compile
+    environment:
+      ANDROID_PLATFORM: android-31
+      TARGET_ARCH: arm64-v8a
+      BUILD_TYPE: ${BUILD_TYPE}
+      HOST_USER_ID: ${HOST_USER_ID}
+      OUTPUT_DIR: /mnt/output
+    volumes:
+      - ${LLAMA_CPP_REPO}:/mnt/llama_cpp_repo:ro
+      - ${OUTPUT_PATH}/build_qnn:/mnt/output:rw
+    command: 
+      - sh 
+      - -c 
+      - |
+        echo "ANDROID_NDK_HOME: $$ANDROID_NDK_HOME"
+        echo "QNN_SDK_PATH: $$QNN_SDK_PATH"
+        rsync -a --delete --exclude=env --exclude='run_server.sh' --exclude='build/*' --exclude='build_*' --exclude='models/*' /mnt/llama_cpp_repo/ ./
+        mkdir -p ./build_qnn
+        rm -rf ./build_qnn/*
+        cd ./build_qnn
+        set -e
+        cmake -H.. -B. -DGGML_QNN=on -DBUILD_SHARED_LIBS=off -DGGML_OPENMP=off -DANDROID_ABI="$$TARGET_ARCH" -DANDROID_PLATFORM="$$ANDROID_PLATFORM" -DANDROID_NDK="$$ANDROID_NDK_HOME" -DCMAKE_TOOLCHAIN_FILE="$$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" -DGGML_QNN_SDK_PATH="$$QNN_SDK_PATH" -DCMAKE_BUILD_TYPE="$$BUILD_TYPE"
+        make -j $$(nproc)
+        chmod -R u+rw $$OUTPUT_DIR
+        rsync -av ./bin/test-backend-ops $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnSystem.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnCpu.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnGpu.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtp.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtpNetRunExtensions.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtpPrepare.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtpV73Stub.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtpV75Stub.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so $$OUTPUT_DIR
+        rsync -av $$ANDROID_NDK_HOME/prebuilt/android-arm64/gdbserver/gdbserver $$OUTPUT_DIR
+        chown -R "$$HOST_USER_ID" "$$OUTPUT_DIR"
+    restart: "no"

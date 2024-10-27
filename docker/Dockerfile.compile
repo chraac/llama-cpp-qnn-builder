@@ -1,0 +1,8 @@
+FROM chraac/llama-cpp-qnn-builder:latest
+
+ARG LLAMA_CPP_REPO=/llama_cpp
+
+RUN mkdir -p ${LLAMA_CPP_REPO}
+RUN chmod 777 ${LLAMA_CPP_REPO}
+RUN git config --global --add safe.directory ${LLAMA_CPP_REPO}
+WORKDIR ${LLAMA_CPP_REPO}
