@@ -12,7 +12,7 @@ services:
       OUTPUT_DIR: /mnt/output
     volumes:
       - ${LLAMA_CPP_REPO}:/mnt/llama_cpp_repo:ro
-      - ${OUTPUT_PATH}/build_qnn:/mnt/output:rw
+      - ${OUTPUT_PATH}:/mnt/output:rw
     command: 
       - sh 
       - -c 

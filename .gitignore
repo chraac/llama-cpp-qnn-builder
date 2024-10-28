@@ -1,1 +1,2 @@
-build_qnn/build_qnn/*
+build_qnn/*
+*.log
