@@ -5,7 +5,7 @@ _smb_share_dir="$HOME/smb_shared/qnn/"
 _rebuild=0
 _build_type='Release'
 _copy_to_smb=0
-_user_id=$(id -u)
+_user_id="$(id -u)"
 _reset_submodules=0
 _update_submodules=0
 _in_ci=0
@@ -51,17 +51,16 @@ done
 set -e
 
 if [ $_update_submodules -eq 1 ]; then
-    git submodule foreach --recursive git fetch
     git submodule foreach --recursive git reset --hard
+    git submodule foreach --recursive git fetch
     git submodule update --remote --recursive
     git submodule update --init --recursive --checkout
-    git submodule foreach --recursive git reset --hard
     _reset_submodules=0
 fi
 
 if [ $_reset_submodules -eq 1 ]; then
-    git submodule foreach --recursive git fetch
     git submodule foreach --recursive git reset --hard
+    git submodule foreach --recursive git fetch
     git submodule update --recursive
     git submodule update --init --recursive --checkout
 fi
