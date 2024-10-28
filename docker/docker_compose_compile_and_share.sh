@@ -51,8 +51,8 @@ done
 set -e
 
 if [ $_update_submodules -eq 1 ]; then
-    git submodule foreach --recursive git reset --hard
     git submodule foreach --recursive git fetch
+    git submodule foreach --recursive git reset --hard
     git submodule update --remote --recursive
     git submodule update --init --recursive --checkout
     git submodule foreach --recursive git reset --hard
@@ -60,6 +60,7 @@ if [ $_update_submodules -eq 1 ]; then
 fi
 
 if [ $_reset_submodules -eq 1 ]; then
+    git submodule foreach --recursive git fetch
     git submodule foreach --recursive git reset --hard
     git submodule update --recursive
     git submodule update --init --recursive --checkout

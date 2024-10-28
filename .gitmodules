@@ -1,4 +1,4 @@
 [submodule "llama.cpp"]
 	path = llama.cpp
 	url = https://github.com/chraac/llama.cpp.git
-	branch = dev-refactoring
+	branch = dev-mat-mul-opt
