@@ -50,6 +50,7 @@ if [ $_update_submodules -eq 1 ]; then
     git submodule foreach --recursive git fetch
     git submodule update --remote --recursive
     git submodule update --init --recursive --checkout
+    git submodule foreach --recursive git reset --hard
     _reset_submodules=0
 fi
 
