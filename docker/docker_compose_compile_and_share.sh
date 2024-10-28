@@ -60,8 +60,14 @@ if [ $_reset_submodules -eq 1 ]; then
     git submodule update --init --recursive --checkout
 fi
 
-mkdir -p $_llama_cpp_output_dir
+echo "------------------------------------------------------------"
 echo "script_dir: $_script_dir"
+echo "repo_dir: $_llama_cpp_repo_dir"
+echo "output_dir: $_llama_cpp_output_dir"
+echo "build_type: $_build_type"
+echo "------------------------------------------------------------"
+
+mkdir -p $_llama_cpp_output_dir
 pushd "$_script_dir"
 
 LLAMA_CPP_REPO=$_llama_cpp_repo_dir OUTPUT_PATH=$_llama_cpp_output_dir BUILD_TYPE=$_build_type HOST_USER_ID=$_user_id docker compose -f docker-compose-compile.yml up --build
