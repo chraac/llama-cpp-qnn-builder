@@ -15,5 +15,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
+    - name: Update Submodule
+      run: |
+        git submodule foreach --recursive git fetch
+        git submodule foreach --recursive git reset --hard
+        git submodule update --init --recursive --checkout
+        git submodule update --recursive
     - name: Build
       run: docker/docker_compose_compile_and_share.sh
