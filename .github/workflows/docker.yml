@@ -21,5 +21,7 @@ jobs:
         git submodule foreach --recursive git reset --hard
         git submodule update --init --recursive --checkout
         git submodule update --recursive
-    - name: Build
-      run: docker/docker_compose_compile_and_share.sh
+    - name: Build Debug
+      run: docker/docker_compose_compile_and_share.sh -r -d
+    - name: Build Release
+      run: docker/docker_compose_compile_and_share.sh -r
