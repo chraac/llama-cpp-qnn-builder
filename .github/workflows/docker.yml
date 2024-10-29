@@ -23,9 +23,9 @@ jobs:
         git submodule update --recursive
     - name: Build Debug
       run: |
-        set -e
+        set -eo pipefail
         docker/docker_compose_compile_and_share.sh -r -d --ci
     - name: Build Release
       run: |
-        set -e
+        set -eo pipefail
         docker/docker_compose_compile_and_share.sh -r --ci

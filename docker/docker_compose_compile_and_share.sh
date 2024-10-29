@@ -48,6 +48,10 @@ while (("$#")); do
     esac
 done
 
+if [ $_in_ci -eq 0 ]; then
+    set -e
+fi
+
 if [ $_update_submodules -eq 1 ]; then
     git submodule foreach --recursive git reset --hard
     git submodule foreach --recursive git fetch
@@ -76,6 +80,10 @@ pushd "$_script_dir"
 LLAMA_CPP_REPO=$_llama_cpp_repo_dir OUTPUT_PATH=$_llama_cpp_output_dir BUILD_TYPE=$_build_type HOST_USER_ID=$_user_id docker compose -f docker-compose-compile.yml up --build
 if [ $_copy_to_smb -eq 1 ]; then
     rsync -avL --omit-dir-times --progress $_llama_cpp_output_dir $_smb_share_dir
+fi
+
+if [ $_in_ci -eq 0 ]; then
+    set +e
 fi
 
 popd
