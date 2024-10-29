@@ -50,6 +50,8 @@ done
 
 if [ $_in_ci -eq 0 ]; then
     set -e
+else 
+    set -eo pipefail
 fi
 
 if [ $_update_submodules -eq 1 ]; then
