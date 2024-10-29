@@ -1,12 +1,12 @@
-name: Docker Compose
+name: Docker Builder
 
 on:
   push:
     branches:
-    - master
+    - main
   pull_request:
     branches:
-    - master
+    - main
 
 jobs:
   build-qnn-tests:
@@ -15,5 +15,15 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v1
-    - name: Build
-      run: docker/docker_compose_compile_and_share.sh
+    - name: Update Submodule
+      run: |
+        git submodule foreach --recursive git fetch
+        git submodule foreach --recursive git reset --hard
+        git submodule update --init --recursive --checkout
+        git submodule update --recursive
+    - name: Build Debug
+      run: |
+        docker/docker_compose_compile_and_share.sh -r -d
+    - name: Build Release
+      run: |
+        docker/docker_compose_compile_and_share.sh -r
