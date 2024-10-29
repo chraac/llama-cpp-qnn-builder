@@ -48,11 +48,7 @@ while (("$#")); do
     esac
 done
 
-if [ $_in_ci -eq 0 ]; then
-    set -e
-else 
-    set -eo pipefail
-fi
+set -e
 
 if [ $_update_submodules -eq 1 ]; then
     git submodule foreach --recursive git reset --hard
@@ -84,8 +80,6 @@ if [ $_copy_to_smb -eq 1 ]; then
     rsync -avL --omit-dir-times --progress $_llama_cpp_output_dir $_smb_share_dir
 fi
 
-if [ $_in_ci -eq 0 ]; then
-    set +e
-fi
+set +e
 
 popd
