@@ -8,6 +8,7 @@ _copy_to_smb=0
 _user_id=$(id -u)
 _reset_submodules=0
 _update_submodules=0
+_in_ci=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -36,6 +37,10 @@ while (("$#")); do
         _update_submodules=1
         shift
         ;;
+    --ci)
+        _in_ci=1
+        shift
+        ;;
     *) # preserve positional arguments
         echo "Invalid option $1"
         exit 1
@@ -43,7 +48,9 @@ while (("$#")); do
     esac
 done
 
-set -e
+if [ $_in_ci -eq 0 ]; then
+    set -e
+fi
 
 if [ $_update_submodules -eq 1 ]; then
     git submodule foreach --recursive git reset --hard
@@ -75,6 +82,8 @@ if [ $_copy_to_smb -eq 1 ]; then
     rsync -avL --omit-dir-times --progress $_llama_cpp_output_dir $_smb_share_dir
 fi
 
-set +e
+if [ $_in_ci -eq 0 ]; then
+    set +e
+fi
 
 popd
