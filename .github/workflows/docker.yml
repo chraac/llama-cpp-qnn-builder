@@ -23,7 +23,9 @@ jobs:
         git submodule update --recursive
     - name: Build Debug
       run: |
+        set -e
         docker/docker_compose_compile_and_share.sh -r -d --ci
     - name: Build Release
       run: |
+        set -e
         docker/docker_compose_compile_and_share.sh -r --ci
