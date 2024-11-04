@@ -12,10 +12,14 @@ if ($args.Length -eq 1) {
 
 Get-ChildItem -Path "$_build_path/*.so" | ForEach-Object { adb push $_.FullName $_device_path }
 
-$executable_name = 'test-backend-ops'
-$executable_full_path = "$_device_path$executable_name"
+$test_executable_name = 'test-backend-ops'
+$test_executable_full_path = "$_device_path$test_executable_name"
+adb push "$_build_path/$test_executable_name" $_device_path
+adb shell "chmod +x $test_executable_full_path"
 
-adb push "$_build_path/test-backend-ops" $_device_path
+$executable_name = 'llama-cli'
+$executable_full_path = "$_device_path$executable_name"
+adb push "$_build_path/llama-cli" $_device_path
 adb shell "chmod +x $executable_full_path"
 
 if (Test-Path "$_build_path/lldb-server") {
