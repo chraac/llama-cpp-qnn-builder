@@ -75,7 +75,13 @@ echo "------------------------------------------------------------"
 mkdir -p $_llama_cpp_output_dir
 pushd "$_script_dir"
 
-LLAMA_CPP_REPO=$_llama_cpp_repo_dir OUTPUT_PATH=$_llama_cpp_output_dir BUILD_TYPE=$_build_type HOST_USER_ID=$_user_id docker compose -f docker-compose-compile.yml up --build  --exit-code-from llama-qnn-compile
+_extra_args='--exit-code-from llama-qnn-compile'
+export LLAMA_CPP_REPO=$_llama_cpp_repo_dir
+export OUTPUT_PATH=$_llama_cpp_output_dir
+export BUILD_TYPE=$_build_type
+export HOST_USER_ID=$_user_id
+docker compose -f docker-compose-compile.yml build --pull
+docker compose -f docker-compose-compile.yml up --build $_extra_args
 if [ $_copy_to_smb -eq 1 ]; then
     rsync -avL --omit-dir-times --progress $_llama_cpp_output_dir $_smb_share_dir
 fi
