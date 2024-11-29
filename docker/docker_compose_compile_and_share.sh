@@ -9,6 +9,7 @@ _user_id=$(id -u)
 _reset_submodules=0
 _update_submodules=0
 _in_ci=0
+_pull_latest=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -39,6 +40,10 @@ while (("$#")); do
         ;;
     --ci)
         _in_ci=1
+        shift
+        ;;
+    --pull)
+        _pull_latest=1
         shift
         ;;
     *) # preserve positional arguments
@@ -80,6 +85,10 @@ export LLAMA_CPP_REPO=$_llama_cpp_repo_dir
 export OUTPUT_PATH=$_llama_cpp_output_dir
 export BUILD_TYPE=$_build_type
 export HOST_USER_ID=$_user_id
+if [ $_pull_latest -eq 1 ]; then
+    docker compose -f docker-compose-compile.yml stop
+    docker compose -f docker-compose-compile.yml rm -f
+fi
 docker compose -f docker-compose-compile.yml build --pull
 docker compose -f docker-compose-compile.yml up --build $_extra_args
 if [ $_copy_to_smb -eq 1 ]; then
