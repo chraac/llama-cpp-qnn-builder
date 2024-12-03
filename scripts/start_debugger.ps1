@@ -23,7 +23,7 @@ for ($i = 0; $i -lt $args.Length; $i++) {
 $job = Start-job { adb shell $args[0] } -ArgumentList "cd $_device_path && ./gdbserver :$_port ./$_executable_name $_parameters"
 
 if ($_should_forward_port) {
-    adb forward tcp:$_port tcp:$_port
+    adb forward -a tcp:$_port tcp:$_port
     adb forward --list
 }
 
