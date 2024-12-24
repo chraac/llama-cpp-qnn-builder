@@ -70,11 +70,14 @@ if [ $_reset_submodules -eq 1 ]; then
     git submodule update --init --recursive --checkout
 fi
 
+_git_hash=$(git rev-parse --short HEAD)
+
 echo "------------------------------------------------------------"
 echo "script_dir: $_script_dir"
 echo "repo_dir: $_llama_cpp_repo_dir"
 echo "output_dir: $_llama_cpp_output_dir"
 echo "build_type: $_build_type"
+echo "git_revision: $_git_hash"
 echo "------------------------------------------------------------"
 
 mkdir -p $_llama_cpp_output_dir
