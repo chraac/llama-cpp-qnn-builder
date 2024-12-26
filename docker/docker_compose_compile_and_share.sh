@@ -103,3 +103,5 @@ fi
 set +e
 
 popd
+
+echo "All succeeded, revision: $_repo_git_hash"
