@@ -55,6 +55,7 @@ done
 
 set -e
 
+pushd "$_llama_cpp_repo_dir"
 if [ $_update_submodules -eq 1 ]; then
     git submodule foreach --recursive git reset --hard
     git submodule foreach --recursive git fetch
@@ -70,7 +71,6 @@ if [ $_reset_submodules -eq 1 ]; then
     git submodule update --init --recursive --checkout
 fi
 
-pushd "$_llama_cpp_repo_dir"
 _repo_git_hash=$(git rev-parse --short HEAD)
 popd
 
