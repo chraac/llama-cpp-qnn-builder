@@ -2,7 +2,7 @@
 param (
     [string]$_device_path = '/data/local/tmp/',
     [int]$_port = 23456,
-    [string]$_parameters = 'test -o MUL_MAT',
+    [string]$_parameters = 'test',
     [switch]$_should_forward_port = $false,
     [string]$_executable_name = 'test-backend-ops'
 )

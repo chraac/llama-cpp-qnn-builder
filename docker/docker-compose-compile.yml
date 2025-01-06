@@ -35,10 +35,8 @@ services:
         rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtp.so $$OUTPUT_DIR
         rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtpNetRunExtensions.so $$OUTPUT_DIR
         rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtpPrepare.so $$OUTPUT_DIR
-        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtpV73Stub.so $$OUTPUT_DIR
-        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtpV75Stub.so $$OUTPUT_DIR
-        rsync -av $$QNN_SDK_PATH/lib/hexagon-v73/unsigned/libQnnHtpV73Skel.so $$OUTPUT_DIR
-        rsync -av $$QNN_SDK_PATH/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/aarch64-android/libQnnHtp*Stub.so $$OUTPUT_DIR
+        rsync -av $$QNN_SDK_PATH/lib/hexagon-*/unsigned/libQnnHtp*Skel.so $$OUTPUT_DIR
         rsync -av $$ANDROID_NDK_HOME/prebuilt/android-arm64/gdbserver/gdbserver $$OUTPUT_DIR
         chown -R "$$HOST_USER_ID" "$$OUTPUT_DIR"
     restart: "no"
