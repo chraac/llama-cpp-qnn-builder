@@ -22,6 +22,8 @@ services:
         mkdir -p $$LLAMA_CPP_REPO_LOCAL
         chmod 777 $$LLAMA_CPP_REPO_LOCAL
         git config --global --add safe.directory $$LLAMA_CPP_REPO_LOCAL
+        cd /mnt/llama_cpp_repo/
+        echo "Git revision: $(git rev-parse --short HEAD)"
         cd $$LLAMA_CPP_REPO_LOCAL
         rsync -a --delete --exclude=env --exclude='run_server.sh' --exclude='build/*' --exclude='build_*' --exclude='models/*' /mnt/llama_cpp_repo/ ./
         mkdir -p ./build_qnn
