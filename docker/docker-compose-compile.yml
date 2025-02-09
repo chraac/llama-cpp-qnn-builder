@@ -27,7 +27,7 @@ services:
         rm -rf ./build_qnn/*
         cd ./build_qnn
         set -e
-        cmake -H.. -B. -DGGML_QNN=on -DBUILD_SHARED_LIBS=off -DANDROID_ABI="$$TARGET_ARCH" -DANDROID_PLATFORM="$$ANDROID_PLATFORM" -DANDROID_NDK="$$ANDROID_NDK_HOME" -DCMAKE_TOOLCHAIN_FILE="$$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" -DGGML_QNN_SDK_PATH="$$QNN_SDK_PATH" -DCMAKE_BUILD_TYPE="$$BUILD_TYPE"
+        cmake -H.. -B. -DGGML_QNN=on -DBUILD_SHARED_LIBS=off -DGGML_OPENMP=off -DANDROID_ABI="$$TARGET_ARCH" -DANDROID_PLATFORM="$$ANDROID_PLATFORM" -DANDROID_NDK="$$ANDROID_NDK_HOME" -DCMAKE_TOOLCHAIN_FILE="$$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake" -DGGML_QNN_SDK_PATH="$$QNN_SDK_PATH" -DCMAKE_BUILD_TYPE="$$BUILD_TYPE"
         make -j $$(nproc)
         chmod -R u+rw $$OUTPUT_DIR
         rsync -av ./bin/llama-* $$OUTPUT_DIR
