@@ -104,7 +104,6 @@ if [ $_pull_latest -eq 1 ]; then
     docker compose -f docker-compose-compile.yml stop
     docker compose -f docker-compose-compile.yml down --rmi all
     docker compose -f docker-compose-compile.yml rm -f
-    docker image prune
     docker compose -f docker-compose-compile.yml pull
 fi
 docker compose -f docker-compose-compile.yml build --pull
