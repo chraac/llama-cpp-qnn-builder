@@ -100,8 +100,12 @@ export OUTPUT_PATH=$_llama_cpp_output_dir
 export BUILD_TYPE=$_build_type
 export HOST_USER_ID=$_user_id
 if [ $_pull_latest -eq 1 ]; then
+    echo 'Pull latest image'
     docker compose -f docker-compose-compile.yml stop
+    docker compose -f docker-compose-compile.yml down --rmi all
     docker compose -f docker-compose-compile.yml rm -f
+    docker image prune
+    docker compose -f docker-compose-compile.yml pull
 fi
 docker compose -f docker-compose-compile.yml build --pull
 docker compose -f docker-compose-compile.yml up --build $_extra_args
