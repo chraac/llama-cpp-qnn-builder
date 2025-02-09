@@ -1,15 +1,14 @@
 services:
   llama-qnn-compile:
     platform: linux/x86_64
-    build: 
-      context: .
-      dockerfile: Dockerfile.compile
+    image: chraac/llama-cpp-qnn-builder:latest
     environment:
       ANDROID_PLATFORM: android-31
       TARGET_ARCH: arm64-v8a
       BUILD_TYPE: ${BUILD_TYPE}
       HOST_USER_ID: ${HOST_USER_ID}
       OUTPUT_DIR: /mnt/output
+      LLAMA_CPP_REPO: /llama_cpp
     volumes:
       - ${LLAMA_CPP_REPO}:/mnt/llama_cpp_repo:ro
       - ${OUTPUT_PATH}:/mnt/output:rw
@@ -19,6 +18,10 @@ services:
       - |
         echo "ANDROID_NDK_HOME: $$ANDROID_NDK_HOME"
         echo "QNN_SDK_PATH: $$QNN_SDK_PATH"
+        mkdir -p ${LLAMA_CPP_REPO}
+        chmod 777 ${LLAMA_CPP_REPO}
+        git config --global --add safe.directory ${LLAMA_CPP_REPO}
+        cd ${LLAMA_CPP_REPO}
         rsync -a --delete --exclude=env --exclude='run_server.sh' --exclude='build/*' --exclude='build_*' --exclude='models/*' /mnt/llama_cpp_repo/ ./
         mkdir -p ./build_qnn
         rm -rf ./build_qnn/*
