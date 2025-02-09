@@ -8,10 +8,10 @@ services:
       BUILD_TYPE: ${BUILD_TYPE}
       HOST_USER_ID: ${HOST_USER_ID}
       OUTPUT_DIR: /mnt/output
-      LLAMA_CPP_REPO_LOCAL: /llama_cpp
+      LOCAL_REPO_DIR: '/llama_cpp'
       CMAKE_EXTRA_OPTIONS: '-DBUILD_SHARED_LIBS=off -DGGML_OPENMP=off'
     volumes:
-      - ${LLAMA_CPP_REPO}:/mnt/llama_cpp_repo:ro
+      - ${LLAMA_CPP_REPO}:/mnt/llama_cpp_mount:ro
       - ${OUTPUT_PATH}:/mnt/output:rw
     command: 
       - sh 
@@ -19,11 +19,11 @@ services:
       - |
         echo "ANDROID_NDK_HOME: $$ANDROID_NDK_HOME"
         echo "QNN_SDK_PATH: $$QNN_SDK_PATH"
-        mkdir -p $$LLAMA_CPP_REPO_LOCAL
-        chmod 777 $$LLAMA_CPP_REPO_LOCAL
-        cd $$LLAMA_CPP_REPO_LOCAL
-        rsync -a --delete --exclude=env --exclude='run_server.sh' --exclude='build/*' --exclude='build_*' --exclude='models/*' /mnt/llama_cpp_repo/ ./
-        git config --global --add safe.directory ./
+        mkdir -p $$LOCAL_REPO_DIR
+        chmod 777 $$LOCAL_REPO_DIR
+        cd $$LOCAL_REPO_DIR
+        rsync -a --delete --exclude=env --exclude='run_server.sh' --exclude='build/*' --exclude='build_*' --exclude='models/*' /mnt/llama_cpp_mount/ ./
+        git config --global --add safe.directory $$LOCAL_REPO_DIR
         echo "Git revision: $(git rev-parse --short HEAD)"
         mkdir -p ./build_qnn
         rm -rf ./build_qnn/*
