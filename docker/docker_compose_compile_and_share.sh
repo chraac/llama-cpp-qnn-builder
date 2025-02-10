@@ -10,6 +10,7 @@ _reset_submodules=0
 _update_submodules=0
 _in_ci=0
 _pull_latest=0
+_print_build_time=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -44,6 +45,10 @@ while (("$#")); do
         ;;
     --pull)
         _pull_latest=1
+        shift
+        ;;
+    --print-build-time)
+        _print_build_time=1
         shift
         ;;
     *) # preserve positional arguments
@@ -82,6 +87,10 @@ echo "output_dir: $_llama_cpp_output_dir"
 echo "build_type: $_build_type"
 echo "------------------------------------------------------------"
 
+if [ $_print_build_time -eq 1 ]; then
+    _start_time=$(date +%s)
+fi
+
 mkdir -p $_llama_cpp_output_dir
 pushd "$_script_dir"
 
@@ -91,8 +100,11 @@ export OUTPUT_PATH=$_llama_cpp_output_dir
 export BUILD_TYPE=$_build_type
 export HOST_USER_ID=$_user_id
 if [ $_pull_latest -eq 1 ]; then
+    echo 'Pull latest image'
     docker compose -f docker-compose-compile.yml stop
+    docker compose -f docker-compose-compile.yml down --rmi all
     docker compose -f docker-compose-compile.yml rm -f
+    docker compose -f docker-compose-compile.yml pull
 fi
 docker compose -f docker-compose-compile.yml build --pull
 docker compose -f docker-compose-compile.yml up --build $_extra_args
@@ -104,4 +116,10 @@ set +e
 
 popd
 
+if [ $_print_build_time -eq 1 ]; then
+    _total_time=$(date +%s)
+    _total_time=$((($_total_time - $_start_time)))
+    # print total time in min and sec
+    echo "Total build time: $(($_total_time / 60)) min $(($_total_time % 60)) sec"
+fi
 echo "All succeeded, revision: $_repo_git_hash"
