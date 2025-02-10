@@ -14,8 +14,5 @@ services:
       - ${LLAMA_CPP_REPO}:/mnt/llama_cpp_mount:ro
       - ${OUTPUT_PATH}:/mnt/output:rw
       - ./build_in_container.sh:/mnt/build_in_container.sh:rx
-    command: 
-      - sh 
-      - -c 
-      - /mnt/build_in_container.sh
+    command: sh -c /mnt/build_in_container.sh
     restart: "no"
