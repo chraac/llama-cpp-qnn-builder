@@ -5,7 +5,7 @@ services:
     environment:
       ANDROID_PLATFORM: android-31
       TARGET_ARCH: arm64-v8a # arm64-v8a, armeabi-v7a, x86_64, x86
-      TARGET_PLATFORM: android # android or linux
+      TARGET_PLATFORM: ${TARGET_PLATFORM} # android or linux
       BUILD_TYPE: ${BUILD_TYPE}
       HOST_USER_ID: ${HOST_USER_ID}
       OUTPUT_DIR: /mnt/output
