@@ -67,10 +67,11 @@ rsync -av $_qnn_libs_path/libQnnSystem.so $OUTPUT_DIR
 rsync -av $_qnn_libs_path/libQnnCpu.so $OUTPUT_DIR
 rsync -av $_qnn_libs_path/libQnnGpu.so $OUTPUT_DIR
 rsync -av $_qnn_libs_path/libQnnHtp.so $OUTPUT_DIR
-rsync -av $_qnn_libs_path/libQnnHtpNetRunExtensions.so $OUTPUT_DIR
-rsync -av $_qnn_libs_path/libQnnHtpPrepare.so $OUTPUT_DIR
-rsync -av $_qnn_libs_path/libQnnHtp*Stub.so $OUTPUT_DIR
-rsync -av $QNN_SDK_PATH/lib/hexagon-*/unsigned/libQnnHtp*Skel.so $OUTPUT_DIR
-rsync -av $ANDROID_NDK_HOME/prebuilt/android-arm64/gdbserver/gdbserver $OUTPUT_DIR
+rsync -av $_qnn_libs_path/libQnnHtp*.so $OUTPUT_DIR
+if [ "$TARGET_PLATFORM" = "android" ]; then
+    echo "Copying android specific files"
+    rsync -av $QNN_SDK_PATH/lib/hexagon-*/unsigned/libQnnHtp*Skel.so $OUTPUT_DIR
+    rsync -av $ANDROID_NDK_HOME/prebuilt/android-arm64/gdbserver/gdbserver $OUTPUT_DIR
+fi
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
 set +e
