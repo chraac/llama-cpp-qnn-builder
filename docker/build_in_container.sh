@@ -7,6 +7,7 @@ echo "TARGET_PLATFORM: $TARGET_PLATFORM"
 echo "TARGET_ARCH: $TARGET_ARCH"
 echo "ANDROID_API_LEVEL: $ANDROID_PLATFORM"
 echo "BUILD_TYPE: $BUILD_TYPE"
+echo "ENABLE_CPU_BACKEND: $ENABLE_CPU_BACKEND"
 
 mkdir -p $LOCAL_REPO_DIR
 chmod 777 $LOCAL_REPO_DIR
@@ -29,7 +30,12 @@ if [ -z "$TARGET_ARCH" ]; then
     exit 1
 fi
 
-_extra_options="$CMAKE_EXTRA_OPTIONS"
+if [ -z "$ENABLE_CPU_BACKEND" ]; then
+    echo "ENABLE_CPU_BACKEND is not set"
+    ENABLE_CPU_BACKEND=OFF
+fi
+
+_extra_options="$CMAKE_EXTRA_OPTIONS -DGGML_QNN_ENABLE_CPU_BACKEND=$ENABLE_CPU_BACKEND"
 if [ "$TARGET_PLATFORM" = "android" ]; then
     if [ -z "$ANDROID_NDK_HOME" ]; then
         echo "ANDROID_NDK_HOME is not set"
