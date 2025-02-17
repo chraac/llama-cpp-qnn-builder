@@ -13,7 +13,7 @@ _pull_latest=0
 _print_build_time=0
 _build_platform='android' # default build platform, could be 'android' or 'linux'
 _build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
-_enable_cpu_backend=OFF
+_build_options='-DBUILD_SHARED_LIBS=off -DGGML_OPENMP=off -DGGML_QNN_ENABLE_CPU_BACKEND=off'
 
 # Parse command-line arguments
 while (("$#")); do
@@ -57,7 +57,7 @@ while (("$#")); do
     --build-linux-x64)
         _build_platform='linux'
         _build_arch='x86_64'
-        _enable_cpu_backend=ON
+        _build_options='-DBUILD_SHARED_LIBS=off -DGGML_OPENMP=off -DGGML_QNN_ENABLE_CPU_BACKEND=on'
         shift
         ;;
     *) # preserve positional arguments
@@ -114,7 +114,7 @@ export BUILD_TYPE=$_build_type
 export HOST_USER_ID=$_user_id
 export TARGET_PLATFORM=$_build_platform
 export TARGET_ARCH=$_build_arch
-export ENABLE_CPU_BACKEND=$_enable_cpu_backend
+export CMAKE_EXTRA_BUILD_OPTIONS=$_build_options
 if [ $_pull_latest -eq 1 ]; then
     echo 'Pull latest image'
     docker compose -f docker-compose-compile.yml stop
