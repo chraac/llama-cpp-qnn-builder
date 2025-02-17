@@ -1,3 +1,4 @@
 build_qnn/*
 *.log
 *.gguf
+build_qnn_*

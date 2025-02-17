@@ -86,6 +86,8 @@ fi
 _repo_git_hash=$(git rev-parse --short HEAD)
 popd
 
+_llama_cpp_output_dir="$_script_dir/../build_qnn_${_build_arch}"
+
 echo "------------------------------------------------------------"
 echo "script_dir: $_script_dir"
 echo "repo_dir: $_llama_cpp_repo_dir"

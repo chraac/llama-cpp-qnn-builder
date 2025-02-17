@@ -3,7 +3,7 @@
 IS_PUSH_ONLY=false
 DEVICE_PATH='/data/local/tmp'
 SCRIPT_PATH=$(dirname "$(realpath "$0")")
-BUILD_PATH="$SCRIPT_PATH/../build_qnn"
+BUILD_PATH="$SCRIPT_PATH/../build_qnn_arm64-v8a"
 
 if [ "$#" -eq 1 ]; then
     if [ "$1" == "-p" ]; then

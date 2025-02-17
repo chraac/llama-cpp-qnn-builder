@@ -2,7 +2,7 @@
 $_is_push_only = $false
 $_device_path = '/data/local/tmp'
 $_script_path = Split-Path -Parent $MyInvocation.MyCommand.Path
-$_build_path = "$_script_path/../build_qnn"
+$_build_path = "$_script_path/../build_qnn_arm64-v8a"
 
 if ($args.Length -eq 1) {
     if ($args[0] -eq '-p') {
