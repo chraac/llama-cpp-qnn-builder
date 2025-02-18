@@ -28,6 +28,4 @@ jobs:
     - name: Build Linux Debug
       run: docker/docker_compose_compile_and_share.sh -r -d --print-build-time --build-linux-x64
     - name: Run test-backend-ops
-      run: |
-        sudo apt update && sudo apt install libc++-dev
-        LD_LIBRARY_PATH='build_qnn_x86_64:$LD_LIBRARY_PATH' build_qnn_x86_64/test-backend-ops test -b qnn-cpu
+      run: docker/docker_compose_run_test.sh

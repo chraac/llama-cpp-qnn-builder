@@ -1,0 +1,4 @@
+FROM ubuntu:jammy
+
+RUN apt update
+RUN apt install libc++-dev clang -y
