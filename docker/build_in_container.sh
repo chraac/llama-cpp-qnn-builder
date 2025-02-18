@@ -9,6 +9,17 @@ echo "ANDROID_API_LEVEL: $ANDROID_PLATFORM"
 echo "BUILD_TYPE: $BUILD_TYPE"
 echo "CMAKE_EXTRA_BUILD_OPTIONS: $CMAKE_EXTRA_BUILD_OPTIONS"
 
+if [ -z "$QNN_SDK_PATH" ]; then
+    echo "QNN_SDK_PATH is not set"
+    exit 1
+fi
+
+if [ -z "$TARGET_ARCH" ]; then
+    echo "TARGET_ARCH is not set"
+    exit 1
+fi
+
+# Sync the source code from the mounted directory to the local directory
 mkdir -p $LOCAL_REPO_DIR
 chmod 777 $LOCAL_REPO_DIR
 cd $LOCAL_REPO_DIR
@@ -19,16 +30,6 @@ mkdir -p ./build_qnn
 rm -rf ./build_qnn/*
 cd ./build_qnn
 set -e
-
-if [ -z "$QNN_SDK_PATH" ]; then
-    echo "QNN_SDK_PATH is not set"
-    exit 1
-fi
-
-if [ -z "$TARGET_ARCH" ]; then
-    echo "TARGET_ARCH is not set"
-    exit 1
-fi
 
 _extra_options="$CMAKE_EXTRA_BUILD_OPTIONS"
 if [ "$TARGET_PLATFORM" = "android" ]; then
@@ -59,8 +60,11 @@ else
     exit 1
 fi
 
+# Build llama
 cmake -H.. -B. -DGGML_QNN=on $_extra_options -DGGML_QNN_SDK_PATH="$QNN_SDK_PATH" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
 make -j $(nproc)
+
+# Copy the output files to the output directory
 chmod -R u+rw $OUTPUT_DIR
 rsync -av ./bin/llama-* $OUTPUT_DIR
 rsync -av ./bin/test-backend-ops $OUTPUT_DIR
