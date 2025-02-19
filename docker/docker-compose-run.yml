@@ -1,9 +1,7 @@
 services:
   llama-qnn-run:
     platform: linux/x86_64
-    build: 
-      context: .
-      dockerfile: Dockerfile.run
+    image: chraac/llama-cpp-qnn-builder:latest
     environment:
       EXEC_MOUNT_POINT: /mnt/build_qnn_x86_64
       LD_LIBRARY_PATH: /mnt/build_qnn_x86_64
