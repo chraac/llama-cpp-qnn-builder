@@ -35,7 +35,7 @@ jobs:
     env:
       QNN_VERSION: 2.31.0.250130
       QNN_BASE_PATH: C:/qnn_sdk
-      MSVC_INSTALL_PATH: "C:/Program Files/Microsoft Visual Studio/2022"
+      MSVC_INSTALL_PATH: 'C:/Program Files/Microsoft Visual Studio/2022'
     steps:
     - name: Checkout
       uses: actions/checkout@v1
