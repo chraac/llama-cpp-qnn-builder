@@ -1,0 +1,59 @@
+name: Docker Builder
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build-android-qnn-and-run-tests:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Update Submodule
+      run: |
+        git submodule foreach --recursive git fetch
+        git submodule foreach --recursive git reset --hard
+        git submodule update --init --recursive --checkout
+        git submodule update --recursive
+    - name: Build Debug
+      run: docker/docker_compose_compile_and_share.sh -r -d --print-build-time
+    - name: Build Release
+      run: docker/docker_compose_compile_and_share.sh -r --print-build-time
+    - name: Build Linux Debug
+      run: docker/docker_compose_compile_and_share.sh -r -d --print-build-time --build-linux-x64
+    - name: Run test-backend-ops
+      run: docker/docker_compose_run_test.sh
+  build-windows-qnn:
+    timeout-minutes: 20
+    runs-on: windows-latest
+    env:
+      QNN_VERSION: 2.31.0.250130
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Update Submodule
+      run: |
+        git submodule foreach --recursive git fetch
+        git submodule foreach --recursive git reset --hard
+        git submodule update --init --recursive --checkout
+        git submodule update --recursive
+    - name: Install Qualcomm Ai Engine SDK
+      id: get_qnn_sdk
+      run: |
+        curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v${env:QNN_VERSION}.zip"
+        7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -oC:\qnn_sdk
+        Add-Content $env:GITHUB_ENV "QNN_SDK_PATH=C:\qnn_sdk\qairt\${env:QNN_VERSION}"
+    - name: Install Ninja
+      run: |
+        choco install ninja
+    - name: Build
+      run: |
+        "C:\Program Files\Microsoft Visual Studio\2022\VC\Auxiliary\Build\vcvarsamd64_arm64.bat"
+        cmake --preset "arm64-windows-llvm-debug" -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH=${env:QNN_SDK_PATH}
+        cmake --build .\build-arm64-windows-llvm-debug\ --clean-first -j ${env:NUMBER_OF_PROCESSORS}
