@@ -55,5 +55,5 @@ jobs:
         choco install ninja
     - name: Build
       run: |
-        cmake --preset arm64-windows-llvm-debug -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH=${env:QNN_SDK_PATH}
+        cmake --preset arm64-windows-llvm-debug -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH="${env:QNN_SDK_PATH}"
         cmake --build build-arm64-windows-llvm-debug --clean-first -j ${env:NUMBER_OF_PROCESSORS}
