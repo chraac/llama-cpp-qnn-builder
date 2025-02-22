@@ -34,6 +34,8 @@ jobs:
     runs-on: windows-latest
     env:
       QNN_VERSION: 2.31.0.250130
+      QNN_BASE_PATH: C:\qnn_sdk
+      MSVC_INSTALL_PATH: C:\Program Files\Microsoft Visual Studio\2022
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -47,13 +49,13 @@ jobs:
       id: get_qnn_sdk
       run: |
         curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v${env:QNN_VERSION}.zip"
-        7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -oC:\qnn_sdk
-        Add-Content $env:GITHUB_ENV "QNN_SDK_PATH=C:\qnn_sdk\qairt\${env:QNN_VERSION}"
+        7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -o${env:QNN_BASE_PATH}
+        Add-Content $env:GITHUB_ENV "QNN_SDK_PATH=${env:QNN_BASE_PATH}\qairt\${env:QNN_VERSION}"
     - name: Install Ninja
       run: |
         choco install ninja
     - name: Build
       run: |
-        "C:\Program Files\Microsoft Visual Studio\2022\VC\Auxiliary\Build\vcvarsamd64_arm64.bat"
+        ${env:MSVC_INSTALL_PATH}\VC\Auxiliary\Build\vcvarsamd64_arm64.bat
         cmake --preset arm64-windows-llvm-debug -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH=${env:QNN_SDK_PATH}
         cmake --build build-arm64-windows-llvm-debug --clean-first -j ${env:NUMBER_OF_PROCESSORS}
