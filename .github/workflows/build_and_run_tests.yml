@@ -35,6 +35,7 @@ jobs:
     env:
       QNN_VERSION: 2.31.0.250130
       QNN_BASE_PATH: 'C:\qnn_sdk'
+      QNN_BUILD_PRESET: arm64-windows-llvm-debug
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -44,17 +45,18 @@ jobs:
         git submodule foreach --recursive git reset --hard
         git submodule update --init --recursive --checkout
         git submodule update --recursive
+    - name: Install Ninja
+      id: install_ninja
+      run: |
+        choco install ninja
     - name: Install Qualcomm Ai Engine SDK
       id: get_qnn_sdk
       run: |
         curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v${env:QNN_VERSION}.zip"
         7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -o"${env:QNN_BASE_PATH}"
         Add-Content $env:GITHUB_ENV "QNN_SDK_PATH=${env:QNN_BASE_PATH}/qairt/${env:QNN_VERSION}"
-    - name: Install Ninja
-      run: |
-        choco install ninja
     - name: Build
       run: |
-        cd .\llama.cpp
-        cmake --preset arm64-windows-llvm-debug -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH="${env:QNN_SDK_PATH}"
-        cmake --build build-arm64-windows-llvm-debug --clean-first -j ${env:NUMBER_OF_PROCESSORS}
+        cd llama.cpp
+        cmake --preset "${env:QNN_BUILD_PRESET}" -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH="${env:QNN_SDK_PATH}"
+        cmake --build "build-${env:QNN_BUILD_PRESET}" --clean-first -j ${env:NUMBER_OF_PROCESSORS}
