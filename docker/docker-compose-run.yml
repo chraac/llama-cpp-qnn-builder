@@ -1,0 +1,13 @@
+services:
+  llama-qnn-run:
+    platform: linux/x86_64
+    image: chraac/llama-cpp-qnn-builder:latest
+    environment:
+      EXEC_MOUNT_POINT: /mnt/build_qnn_x86_64
+      LD_LIBRARY_PATH: /mnt/build_qnn_x86_64
+    volumes:
+      - ../build_qnn_x86_64:/mnt/build_qnn_x86_64:rx
+    command: |
+      sh -c "cd $$EXEC_MOUNT_POINT && ./test-backend-ops test -b qnn-cpu"
+      sh -c "cd $$EXEC_MOUNT_POINT && ./test-backend-ops test -b qnn-npu"
+    restart: "no"

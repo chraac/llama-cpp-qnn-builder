@@ -11,6 +11,9 @@ _update_submodules=0
 _in_ci=0
 _pull_latest=0
 _print_build_time=0
+_build_platform='android' # default build platform, could be 'android' or 'linux'
+_build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
+_build_options='-DBUILD_SHARED_LIBS=off -DGGML_OPENMP=off -DGGML_QNN_ENABLE_CPU_BACKEND=off'
 
 # Parse command-line arguments
 while (("$#")); do
@@ -51,6 +54,12 @@ while (("$#")); do
         _print_build_time=1
         shift
         ;;
+    --build-linux-x64)
+        _build_platform='linux'
+        _build_arch='x86_64'
+        _build_options='-DBUILD_SHARED_LIBS=off -DGGML_OPENMP=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DLLAMA_SANITIZE_ADDRESS=on'
+        shift
+        ;;
     *) # preserve positional arguments
         echo "Invalid option $1"
         exit 1
@@ -79,11 +88,15 @@ fi
 _repo_git_hash=$(git rev-parse --short HEAD)
 popd
 
+_llama_cpp_output_dir="$_script_dir/../build_qnn_${_build_arch}"
+
 echo "------------------------------------------------------------"
 echo "script_dir: $_script_dir"
 echo "repo_dir: $_llama_cpp_repo_dir"
 echo "repo_revision: $_repo_git_hash"
 echo "output_dir: $_llama_cpp_output_dir"
+echo "build_platform: $_build_platform"
+echo "build_arch: $_build_arch"
 echo "build_type: $_build_type"
 echo "------------------------------------------------------------"
 
@@ -94,20 +107,26 @@ fi
 mkdir -p $_llama_cpp_output_dir
 pushd "$_script_dir"
 
-_extra_args='--exit-code-from llama-qnn-compile'
 export LLAMA_CPP_REPO=$_llama_cpp_repo_dir
 export OUTPUT_PATH=$_llama_cpp_output_dir
 export BUILD_TYPE=$_build_type
 export HOST_USER_ID=$_user_id
+export TARGET_PLATFORM=$_build_platform
+export TARGET_ARCH=$_build_arch
+export CMAKE_EXTRA_BUILD_OPTIONS=$_build_options
+
+_extra_args='--exit-code-from llama-qnn-compile'
+_compose_command='docker compose -f docker-compose-compile.yml'
 if [ $_pull_latest -eq 1 ]; then
     echo 'Pull latest image'
-    docker compose -f docker-compose-compile.yml stop
-    docker compose -f docker-compose-compile.yml down --rmi all
-    docker compose -f docker-compose-compile.yml rm -f
-    docker compose -f docker-compose-compile.yml pull
+    $_compose_command stop
+    $_compose_command down --rmi all
+    $_compose_command rm -f
+    $_compose_command pull
 fi
-docker compose -f docker-compose-compile.yml build --pull
-docker compose -f docker-compose-compile.yml up --build $_extra_args
+
+$_compose_command build --pull
+$_compose_command up --build $_extra_args
 if [ $_copy_to_smb -eq 1 ]; then
     rsync -avL --omit-dir-times --progress $_llama_cpp_output_dir $_smb_share_dir
 fi
