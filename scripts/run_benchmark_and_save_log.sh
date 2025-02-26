@@ -19,6 +19,11 @@ while [[ $# -gt 0 ]]; do
         _SHOULD_PUSH_TO_DEVICE=1
         shift
         ;;
+    --model-name)
+        _MODEL_NAME="$2"
+        shift
+        shift
+        ;;
     *)
         echo "Invalid option $1"
         exit 1
