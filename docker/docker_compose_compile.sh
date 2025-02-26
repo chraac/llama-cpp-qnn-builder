@@ -59,6 +59,9 @@ while (("$#")); do
         _build_platform='linux'
         _build_arch='x86_64'
         _build_options='-DBUILD_SHARED_LIBS=off -DGGML_OPENMP=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DLLAMA_SANITIZE_ADDRESS=on'
+        shift
+        ;;
+    --run-tests)
         _run_backend_tests=1
         shift
         ;;
