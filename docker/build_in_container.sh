@@ -50,7 +50,7 @@ if [ "$TARGET_PLATFORM" = "android" ]; then
     fi
     # disable openmp for android
     _android_ndk_options="-DANDROID_ABI=$TARGET_ARCH \
-        -DGGML_OPENMP='off' \   
+        -DGGML_OPENMP='off' \
         -DANDROID_PLATFORM=$ANDROID_PLATFORM \
         -DANDROID_NDK=$ANDROID_NDK_HOME \
         -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake"
