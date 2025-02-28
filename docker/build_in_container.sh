@@ -43,6 +43,8 @@ if [ "$TARGET_PLATFORM" = "android" ]; then
     fi
 
     if [ "$BUILD_TYPE" = "Release" ]; then
+        # workaround for android ndk r32
+        # for more detail: https://github.com/android/ndk/issues/1740
         BUILD_TYPE="MinSizeRel"
         echo "Building for android release $BUILD_TYPE"
     fi
