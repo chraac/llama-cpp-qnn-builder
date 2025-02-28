@@ -61,7 +61,13 @@ else
 fi
 
 # Build llama
-cmake -H.. -B. -DGGML_QNN=on $_extra_options -DGGML_QNN_SDK_PATH="$QNN_SDK_PATH" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+cmake -H.. -B. \
+    -DGGML_QNN=on $_extra_options \
+    -DGGML_QNN_SDK_PATH="$QNN_SDK_PATH" \
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+    -DCMAKE_C_FLAGS_RELEASE="-O3" \
+    -DCMAKE_CXX_FLAGS_RELEASE="-O3"
+
 cmake --build . --config $BUILD_TYPE -- -j$(nproc)
 
 # Copy the output files to the output directory
