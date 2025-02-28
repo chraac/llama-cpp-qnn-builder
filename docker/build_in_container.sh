@@ -42,7 +42,12 @@ if [ "$TARGET_PLATFORM" = "android" ]; then
         exit 1
     fi
 
-    _android_ndk_options="-DANDROID_ABI=$TARGET_ARCH -DANDROID_PLATFORM=$ANDROID_PLATFORM -DANDROID_NDK=$ANDROID_NDK_HOME -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake"
+    _android_ndk_options="-DANDROID_ABI=$TARGET_ARCH \
+        -DANDROID_PLATFORM=$ANDROID_PLATFORM \
+        -DANDROID_NDK=$ANDROID_NDK_HOME \
+        -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+        -DCMAKE_C_FLAGS_RELEASE='-O3' \
+        -DCMAKE_CXX_FLAGS_RELEASE='-O3'"
     _extra_options="$_extra_options $_android_ndk_options"
     _qnn_libs_path="$QNN_SDK_PATH/lib/aarch64-android"
 elif [ "$TARGET_PLATFORM" = "linux" ]; then
@@ -64,9 +69,7 @@ fi
 cmake -H.. -B. \
     -DGGML_QNN=on $_extra_options \
     -DGGML_QNN_SDK_PATH="$QNN_SDK_PATH" \
-    -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-    -DCMAKE_C_FLAGS_RELEASE="-O3" \
-    -DCMAKE_CXX_FLAGS_RELEASE="-O3"
+    -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
 cmake --build . --config $BUILD_TYPE -- -j$(nproc)
 
