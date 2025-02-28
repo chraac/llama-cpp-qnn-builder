@@ -1,7 +1,27 @@
 #!/bin/bash
 
-SCRIPT_PATH=$(dirname "$(realpath "$0")")
-DEVICE_PATH='/data/local/tmp'
-LOG_FILE_PATH="$SCRIPT_PATH/../test-backend-ops_all.log"
+_SCRIPT_PATH=$(dirname "$(realpath "$0")")
+_DEVICE_PATH='/data/local/tmp'
+_LOG_FILE_PATH="$_SCRIPT_PATH/../test-backend-ops_all.log"
+_SHOULD_PUSH_TO_DEVICE=0
 
-adb shell "cd $DEVICE_PATH && LLAMA_CACHE=$DEVICE_PATH/cache ./test-backend-ops test" >$LOG_FILE_PATH 2>&1
+# parse arguments to get the log file name
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+    --push-to-device)
+        _SHOULD_PUSH_TO_DEVICE=1
+        shift
+        ;;
+    *)
+        echo "Invalid option $1"
+        exit 1
+        ;;
+    esac
+done
+
+if [ $_SHOULD_PUSH_TO_DEVICE -eq 1 ]; then
+    "$_SCRIPT_PATH/push_and_run_test.sh" -p
+fi
+
+adb shell "cd $_DEVICE_PATH && LLAMA_CACHE=$_DEVICE_PATH/cache ./test-backend-ops test" >$_LOG_FILE_PATH 2>&1
