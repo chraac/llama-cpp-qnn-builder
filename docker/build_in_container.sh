@@ -43,7 +43,7 @@ if [ "$TARGET_PLATFORM" = "android" ]; then
     fi
 
     if [ "$BUILD_TYPE" = "Release" ]; then
-        # workaround for android ndk r32
+        # workaround for android ndk r23
         # for more detail: https://github.com/android/ndk/issues/1740
         BUILD_TYPE="MinSizeRel"
         echo "Building for android release $BUILD_TYPE"
@@ -57,7 +57,7 @@ if [ "$TARGET_PLATFORM" = "android" ]; then
     _extra_options="$_extra_options $_android_ndk_options"
     _qnn_libs_path="$QNN_SDK_PATH/lib/aarch64-android"
 elif [ "$TARGET_PLATFORM" = "linux" ]; then
-    _extra_options="$_extra_options $_android_ndk_options"
+    _extra_options="$_extra_options"
     if [ "$TARGET_ARCH" = "x86_64" ]; then
         _qnn_libs_path="$QNN_SDK_PATH/lib/x86_64-linux-clang"
     elif [ "$TARGET_ARCH" = "arm64-v8a" ]; then
