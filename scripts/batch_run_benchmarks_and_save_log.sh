@@ -6,6 +6,7 @@ _log_file_name='llama-bench-batch-qnn-gpu-debug.log'
 _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf' 'meta-llama_Meta-Llama-3.2-3B-Instruct-Q4_K_M.gguf' 'meta-llama_Meta-Llama-3-8B-Instruct-Q4_K_M.gguf')
 _should_push_to_device=0
 _verbose_log=0
+_skip_8b=0
 
 # parse arguments to get the log file name
 while [[ $# -gt 0 ]]; do
@@ -24,6 +25,10 @@ while [[ $# -gt 0 ]]; do
         _verbose_log=1
         shift
         ;;
+    --skip_8b)
+        _skip_8b=1
+        shift
+        ;;
     *)
         echo "Invalid option $1"
         exit 1
@@ -33,6 +38,10 @@ done
 
 if [ $_should_push_to_device -eq 1 ]; then
     "$_script_path/push_and_run_test.sh" -p
+fi
+
+if [ $_skip_8b -eq 1 ]; then
+    _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf' 'meta-llama_Meta-Llama-3.2-3B-Instruct-Q4_K_M.gguf')
 fi
 
 extra_args=""
