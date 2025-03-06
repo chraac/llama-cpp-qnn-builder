@@ -59,7 +59,7 @@ while (("$#")); do
         _build_platform='linux'
         _build_arch='x86_64'
         # disable the qnn cpu backend, let the test use ggml cpu backend to cross verify the results
-        _build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=off -DLLAMA_SANITIZE_ADDRESS=on'
+        _build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=off -DGGML_OPENMP=off -DLLAMA_SANITIZE_ADDRESS=on'
         shift
         ;;
     --run-tests)
