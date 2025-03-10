@@ -1,25 +1,22 @@
-$_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$_deviceExecPath = '/data/local/tmp'
-$_deviceModelPath = '/data/local/tmp'
-$_modelName = 'meta-llama_Meta-Llama-3.2-1B-Instruct-f32.gguf'
-$_extraArgs = ''
 
 # Parse command-line arguments
 param (
-    [Parameter(Mandatory = $false)]
-    [string]$ModelName,
-    
-    [Parameter(Mandatory = $false)]
+    [string]$_modelName = 'meta-llama_Meta-Llama-3.2-1B-Instruct-f32.gguf',    
     [switch]$Verbose
 )
 
-# Process named parameters if provided
-if ($ModelName) {
-    $_modelName = $ModelName
-}
+$_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$_deviceExecPath = '/data/local/tmp'
+$_deviceModelPath = '/data/local/tmp'
+$_extraArgs = ''
 
-if ($Verbose) {
-    $_extraArgs = "-v"
+# loop through the arguments
+for ($i = 0; $i -lt $args.Length; $i++) {
+    if ($args[$i] -eq '--model-name') {
+        $_modelName = $args[$i + 1]
+    } elseif ($args[$i] -eq '--verbose') {
+        $_extraArgs += '-v '
+    }
 }
 
 # Build the device command string

@@ -49,7 +49,7 @@ if [ $_verbose_log -eq 1 ]; then
     extra_args="-v"
 fi
 
-log_file_path="$_script_path/../$_log_file_name"
+log_file_path="$_script_path/../run_logs/$_log_file_name"
 
 function run_benchmark() {
     # adb shell 'cd /data/local/tmp/ && LLAMA_CACHE=/data/local/tmp/cache ./llama-bench --progress -v -mmp 0 -m meta-llama_Meta-Llama-3.2-1B-Instruct-f32.gguf' > llama-bench-f32-qnn-gpu-debug.log 2>&1
