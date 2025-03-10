@@ -1,3 +1,4 @@
+
 param (
     [switch]$_pushToDevice = $false
 )
@@ -28,4 +29,4 @@ if ($_pushToDevice) {
 
 # Run the test and redirect output to log file
 $commandString = "cd $_devicePath && LLAMA_CACHE=$_devicePath/cache ./test-backend-ops test"
-adb shell $commandString > $_logFilePath 2>&1
+adb shell $commandString 2>&1 | Out-File -FilePath $_logFilePath
