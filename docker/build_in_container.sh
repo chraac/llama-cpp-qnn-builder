@@ -92,6 +92,10 @@ if [ "$TARGET_PLATFORM" = "android" ]; then
     echo "Copying android specific files"
     rsync -av $QNN_SDK_PATH/lib/hexagon-*/unsigned/libQnnHtp*Skel.so $OUTPUT_DIR
     rsync -av $ANDROID_NDK_HOME/prebuilt/android-arm64/gdbserver/gdbserver $OUTPUT_DIR
+    if [ "$TARGET_ARCH" = "arm64-v8a" ]; then
+        # Fix for another ndk version
+        rsync -av $ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/lib64/clang/12.0.9/lib/linux/aarch64/libomp.so $OUTPUT_DIR
+    fi
 fi
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
 set +e
