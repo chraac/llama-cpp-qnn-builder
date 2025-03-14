@@ -14,6 +14,7 @@ _print_build_time=0
 _build_platform='android' # default build platform, could be 'android' or 'linux'
 _build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
 _build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=off -DGGML_OPENMP=on'
+_extra_build_options=''
 _run_backend_tests=0
 
 # Parse command-line arguments
@@ -59,7 +60,11 @@ while (("$#")); do
         _build_platform='linux'
         _build_arch='x86_64'
         # disable the qnn cpu backend, let the test use ggml cpu backend to cross verify the results
-        _build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=off -DGGML_OPENMP=on -DLLAMA_SANITIZE_ADDRESS=on'
+        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+        shift
+        ;;
+    --perf-log)
+        _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_PERFORMANCE_TRACKING=on"
         shift
         ;;
     --run-tests)
@@ -72,6 +77,8 @@ while (("$#")); do
         ;;
     esac
 done
+
+_build_options="${_build_options} ${_extra_build_options}"
 
 set -e
 
