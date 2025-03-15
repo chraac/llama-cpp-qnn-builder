@@ -28,6 +28,6 @@ done
 
 device_command_string="cd $_device_exec_path && "
 device_command_string+="LLAMA_CACHE=$_device_exec_path/cache "
-device_command_string+="./llama-cli $_extra_args -mmp 0 -m \"$_device_model_path/${_model_name}\" --color -i -r \"User:\""
+device_command_string+="./llama-cli $_extra_args -m \"$_device_model_path/${_model_name}\" --color -i -r \"User:\""
 
 adb shell $device_command_string
