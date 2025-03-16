@@ -60,7 +60,7 @@ while (("$#")); do
         _build_platform='linux'
         _build_arch='x86_64'
         # disable the qnn cpu backend, let the test use ggml cpu backend to cross verify the results
-        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on -DGGML_AVX=off -DGGML_AVX2=off -DGGML_FMA=off"
         shift
         ;;
     --perf-log)
