@@ -9,7 +9,6 @@ services:
     volumes:
       - ../build_qnn_x86_64:/mnt/build_qnn_x86_64:rx
       - ../run_logs:/mnt/run_logs:w
-    command: |
-      sh -c "cd $$EXEC_MOUNT_POINT && ./test-backend-ops test -b qnn-cpu > $$RUN_LOG_PATH/test-backend-ops-all-cpu.log 2>&1"
-      sh -c "cd $$EXEC_MOUNT_POINT && ./test-backend-ops test -b qnn-npu > $$RUN_LOG_PATH/test-backend-ops-all-npu.log 2>&1"
+      - ./run_in_container.sh:/mnt/run_in_container.sh:rx
+    command: sh -c /mnt/run_in_container.sh
     restart: "no"
