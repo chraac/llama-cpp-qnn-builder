@@ -6,6 +6,7 @@ services:
       EXEC_MOUNT_POINT: /mnt/build_qnn_x86_64
       LD_LIBRARY_PATH: /mnt/build_qnn_x86_64
       RUN_LOG_PATH: /mnt/run_logs
+      TEST_BACKEND: ${TEST_BACKEND}
     volumes:
       - ../build_qnn_x86_64:/mnt/build_qnn_x86_64:rx
       - ../run_logs:/mnt/run_logs:w
