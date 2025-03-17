@@ -9,7 +9,7 @@ _SHOULD_PUSH_TO_DEVICE=0
 while [[ $# -gt 0 ]]; do
     key="$1"
     case $key in
-    --push-to-device)
+    -p | --push-to-device)
         _SHOULD_PUSH_TO_DEVICE=1
         shift
         ;;
