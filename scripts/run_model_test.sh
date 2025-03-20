@@ -6,13 +6,13 @@ _llama_cli="${_script_path}/../build_qnn_x86_64/llama-cli"
 _model_full_path="${_script_path}/../run_logs/meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf"
 _prompt="I believe the meaning of life is"
 _log_file_path="${_script_path}/../run_logs/emulator/model_test.log"
-_extra_args=''
+_extra_args='--device none'
 
 # Parse command-line arguments
 while (("$#")); do
     case "$1" in
     -v | --verbose)
-        _extra_args="-v"
+        _extra_args="${_extra_args} -v"
         shift
         ;;
     *) # preserve positional arguments
