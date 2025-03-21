@@ -4,3 +4,4 @@ build_qnn/*
 build_qnn_*
 .vscode/settings.json
 temp/*
+*.txt
