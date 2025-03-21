@@ -6,7 +6,7 @@ _llama_cli="${_script_path}/../build_qnn_x86_64/llama-cli"
 _model_name='meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf'
 _model_path="${_script_path}/../models"
 _verbose_log=0
-_extra_args=''
+_extra_args='--device none' # skip gpu device
 
 # parse arguments to get the log file name
 while [[ $# -gt 0 ]]; do
