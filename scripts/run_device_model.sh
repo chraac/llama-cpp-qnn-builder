@@ -11,12 +11,12 @@ _extra_args=''
 while [[ $# -gt 0 ]]; do
     key="$1"
     case $key in
-    --model-name)
+    -m | --model-name)
         _model_name="$2"
         shift
         shift
         ;;
-    --verbose)
+    -v | --verbose)
         _extra_args="-v"
         shift
         ;;
@@ -37,6 +37,6 @@ fi
 
 device_command_string="cd $_device_exec_path && "
 device_command_string+="LLAMA_CACHE=$_device_exec_path/cache "
-device_command_string+="./llama-cli $_extra_args -m \"$_device_model_path/${_model_name}\" --color -i -r \"User:\""
+device_command_string+="./llama-cli $_extra_args -m \"$_device_model_path/${_model_name}\" --no-mmap --color -i -r \"User:\""
 
 adb shell $device_command_string
