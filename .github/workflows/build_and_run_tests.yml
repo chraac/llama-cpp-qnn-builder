@@ -3,44 +3,44 @@ name: Build and run tests
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   build-linux-qnn-and-run-tests:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Update Submodule
-      run: |
-        git submodule foreach --recursive git fetch
-        git submodule foreach --recursive git reset --hard
-        git submodule update --init --recursive --checkout
-        git submodule update --recursive
-    - name: Build Linux Debug
-      run: docker/docker_compose_compile.sh -r -d --print-build-time --build-linux-x64
-    - name: Run test-backend-ops cpu
-      run: docker/docker_compose_run_test.sh -b cpu
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Update Submodule
+        run: |
+          git submodule foreach --recursive git fetch
+          git submodule foreach --recursive git reset --hard
+          git submodule update --init --recursive --checkout
+          git submodule update --recursive
+      - name: Build Linux Debug
+        run: docker/docker_compose_compile.sh -r -d --print-build-time --build-linux-x64
+      - name: Run test-backend-ops cpu
+        run: docker/docker_compose_run_test.sh -b cpu
   build-android-qnn:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Update Submodule
-      run: |
-        git submodule foreach --recursive git fetch
-        git submodule foreach --recursive git reset --hard
-        git submodule update --init --recursive --checkout
-        git submodule update --recursive
-    - name: Build Debug
-      run: docker/docker_compose_compile.sh -r -d --print-build-time
-    - name: Build Release
-      run: docker/docker_compose_compile.sh -r --print-build-time
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Update Submodule
+        run: |
+          git submodule foreach --recursive git fetch
+          git submodule foreach --recursive git reset --hard
+          git submodule update --init --recursive --checkout
+          git submodule update --recursive
+      - name: Build Debug
+        run: docker/docker_compose_compile.sh -r -d --print-build-time
+      - name: Build Release
+        run: docker/docker_compose_compile.sh -r --print-build-time
   build-windows-qnn:
     timeout-minutes: 20
     runs-on: windows-latest
@@ -49,26 +49,26 @@ jobs:
       QNN_BASE_PATH: 'C:\qnn_sdk'
       QNN_BUILD_PRESET: arm64-windows-llvm-debug
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Update Submodule
-      run: |
-        git submodule foreach --recursive git fetch
-        git submodule foreach --recursive git reset --hard
-        git submodule update --init --recursive --checkout
-        git submodule update --recursive
-    - name: Install Ninja
-      id: install_ninja
-      run: |
-        choco install ninja
-    - name: Install Qualcomm Ai Engine SDK
-      id: get_qnn_sdk
-      run: |
-        curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v${env:QNN_VERSION}.zip"
-        7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -o"${env:QNN_BASE_PATH}"
-        Add-Content $env:GITHUB_ENV "QNN_SDK_PATH=${env:QNN_BASE_PATH}/qairt/${env:QNN_VERSION}"
-    - name: Build
-      run: |
-        cd llama.cpp
-        cmake --preset "${env:QNN_BUILD_PRESET}" -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH="${env:QNN_SDK_PATH}"
-        cmake --build "build-${env:QNN_BUILD_PRESET}" --clean-first -j ${env:NUMBER_OF_PROCESSORS}
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Update Submodule
+        run: |
+          git submodule foreach --recursive git fetch
+          git submodule foreach --recursive git reset --hard
+          git submodule update --init --recursive --checkout
+          git submodule update --recursive
+      - name: Install Ninja
+        id: install_ninja
+        run: |
+          choco install ninja
+      - name: Install Qualcomm Ai Engine SDK
+        id: get_qnn_sdk
+        run: |
+          curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v${env:QNN_VERSION}.zip"
+          7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -o"${env:QNN_BASE_PATH}"
+          Add-Content $env:GITHUB_ENV "QNN_SDK_PATH=${env:QNN_BASE_PATH}/qairt/${env:QNN_VERSION}"
+      - name: Build
+        run: |
+          cd llama.cpp
+          cmake --preset "${env:QNN_BUILD_PRESET}" -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH="${env:QNN_SDK_PATH}"
+          cmake --build "build-${env:QNN_BUILD_PRESET}" --clean-first -j ${env:NUMBER_OF_PROCESSORS}
