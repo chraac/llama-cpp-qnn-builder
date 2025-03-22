@@ -27,8 +27,8 @@ jobs:
       run: docker/docker_compose_compile.sh -r --print-build-time
     - name: Build Linux Debug
       run: docker/docker_compose_compile.sh -r -d --print-build-time --build-linux-x64
-    - name: Run test-backend-ops
-      run: docker/docker_compose_run_test.sh
+    - name: Run test-backend-ops cpu
+      run: docker/docker_compose_run_test.sh -b cpu
   build-windows-qnn:
     timeout-minutes: 20
     runs-on: windows-latest
