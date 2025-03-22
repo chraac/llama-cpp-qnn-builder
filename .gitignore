@@ -2,3 +2,6 @@ build_qnn/*
 *.log
 *.gguf
 build_qnn_*
+.vscode/settings.json
+temp/*
+*.txt

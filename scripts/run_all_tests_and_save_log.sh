@@ -2,14 +2,14 @@
 
 _SCRIPT_PATH=$(dirname "$(realpath "$0")")
 _DEVICE_PATH='/data/local/tmp'
-_LOG_FILE_PATH="$_SCRIPT_PATH/../test-backend-ops_all.log"
+_LOG_FILE_PATH="$_SCRIPT_PATH/../run_logs/test-backend-ops_all.log"
 _SHOULD_PUSH_TO_DEVICE=0
 
 # parse arguments to get the log file name
 while [[ $# -gt 0 ]]; do
     key="$1"
     case $key in
-    --push-to-device)
+    -p | --push-to-device)
         _SHOULD_PUSH_TO_DEVICE=1
         shift
         ;;
