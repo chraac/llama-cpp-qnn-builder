@@ -83,19 +83,6 @@ cmake --build . --config $BUILD_TYPE -- -j$(nproc)
 chmod -R u+rw $OUTPUT_DIR
 rsync -av ./bin/llama-* $OUTPUT_DIR
 rsync -av ./bin/test-backend-ops $OUTPUT_DIR
-rsync -av ./bin/libQnnSystem.so $OUTPUT_DIR
-rsync -av ./bin/libQnnCpu.so $OUTPUT_DIR
-rsync -av ./bin/libQnnGpu.so $OUTPUT_DIR
-rsync -av ./bin/libQnnHtp.so $OUTPUT_DIR
-rsync -av ./bin/libQnnHtp*.so $OUTPUT_DIR
-if [ "$TARGET_PLATFORM" = "android" ]; then
-    echo "Copying android specific files"
-    rsync -av ./bin/libQnnHtp*Skel.so $OUTPUT_DIR
-    rsync -av ./bin/gdbserver $OUTPUT_DIR
-    if [ "$TARGET_ARCH" = "arm64-v8a" ]; then
-        # Fix for another ndk version
-        rsync -av ./bin/libomp.so $OUTPUT_DIR
-    fi
-fi
+rsync -av ./bin/*.so $OUTPUT_DIR
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
 set +e
