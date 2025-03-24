@@ -23,7 +23,7 @@ fi
 mkdir -p $LOCAL_REPO_DIR
 chmod 777 $LOCAL_REPO_DIR
 cd $LOCAL_REPO_DIR
-rsync -a --delete --exclude=env --exclude='run_server.sh' --exclude='build/*' --exclude='build_*' --exclude='models/*' /mnt/llama_cpp_mount/ ./
+rsync -a --delete --exclude=env --exclude='run_server.sh' --exclude='build/*' --exclude='build_*' --exclude='models/*' --exclude='.vs/*' /mnt/llama_cpp_mount/ ./
 git config --global --add safe.directory $LOCAL_REPO_DIR
 echo "compiling git revision: $(git rev-parse --short HEAD)"
 mkdir -p ./build_qnn
