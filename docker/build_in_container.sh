@@ -2,6 +2,8 @@
 
 echo "LOCAL_REPO_DIR: $LOCAL_REPO_DIR"
 echo "QNN_SDK_PATH: $QNN_SDK_PATH"
+echo "HEXAGON_SDK_PATH: $HEXAGON_SDK_PATH"
+echo "BUILD_HEXAGON_PACKAGE: $BUILD_HEXAGON_PACKAGE"
 echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
 echo "TARGET_PLATFORM: $TARGET_PLATFORM"
 echo "TARGET_ARCH: $TARGET_ARCH"
@@ -85,4 +87,20 @@ rsync -av ./bin/llama-* $OUTPUT_DIR
 rsync -av ./bin/test-backend-ops $OUTPUT_DIR
 rsync -av ./bin/*.so $OUTPUT_DIR
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
+
+if [ $BUILD_HEXAGON_PACKAGE -eq 1 ]; then
+    echo "Building hexagon package"
+    source $QNN_SDK_PATH/bin/envsetup.sh
+    # TODO: install python3 to fix the error here
+    set +e
+    source $HEXAGON_SDK_PATH/setup_sdk_env.source
+    set -e
+    cd ../ggml/src/ggml-qnn/hexagon/GgmlOpPackage
+    cpu_count="$(nproc)"
+    make all -j$cpu_count
+    make htp_v73 -j$cpu_count
+    make htp_v75 -j$cpu_count
+    make htp_v79 -j$cpu_count
+fi
+
 set +e
