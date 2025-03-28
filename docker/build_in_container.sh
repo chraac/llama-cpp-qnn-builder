@@ -97,10 +97,11 @@ if [ $BUILD_HEXAGON_PACKAGE -eq 1 ]; then
     set -e
     cd ../ggml/src/ggml-qnn/hexagon/GgmlOpPackage
     cpu_count="$(nproc)"
-    make all -j$cpu_count
-    make htp_v73 -j$cpu_count
-    make htp_v75 -j$cpu_count
-    make htp_v79 -j$cpu_count
+    package_name='GgmlOpPackage'
+    make all -j$cpu_count PACKAGE_NAME=$package_name
+    make htp_v73 -j$cpu_count PACKAGE_NAME=$package_name
+    make htp_v75 -j$cpu_count PACKAGE_NAME=$package_name
+    make htp_v79 -j$cpu_count PACKAGE_NAME=$package_name
 fi
 
 set +e
