@@ -1,5 +1,7 @@
 #/bin/bash
 
+_cpu_count="$(nproc)"
+
 echo "LOCAL_REPO_DIR: $LOCAL_REPO_DIR"
 echo "QNN_SDK_PATH: $QNN_SDK_PATH"
 echo "HEXAGON_SDK_PATH: $HEXAGON_SDK_PATH"
@@ -9,6 +11,7 @@ echo "TARGET_PLATFORM: $TARGET_PLATFORM"
 echo "TARGET_ARCH: $TARGET_ARCH"
 echo "ANDROID_API_LEVEL: $ANDROID_PLATFORM"
 echo "BUILD_TYPE: $BUILD_TYPE"
+echo "CPU_COUNT: $_cpu_count"
 echo "CMAKE_EXTRA_BUILD_OPTIONS: $CMAKE_EXTRA_BUILD_OPTIONS"
 
 if [ -z "$QNN_SDK_PATH" ]; then
@@ -79,7 +82,7 @@ cmake -H.. -B. \
     -DGGML_QNN_SDK_PATH="$QNN_SDK_PATH" \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-cmake --build . --config $BUILD_TYPE -- -j$(nproc)
+cmake --build . --config $BUILD_TYPE -- -j$_cpu_count
 
 # Copy the output files to the output directory
 chmod -R u+rw $OUTPUT_DIR
@@ -91,17 +94,19 @@ chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
 if [ $BUILD_HEXAGON_PACKAGE -eq 1 ]; then
     echo "Building hexagon package"
     source $QNN_SDK_PATH/bin/envsetup.sh
-    # TODO: install python3 to fix the error here
-    set +e
     source $HEXAGON_SDK_PATH/setup_sdk_env.source
-    set -e
     cd ../ggml/src/ggml-qnn/hexagon/GgmlOpPackage
-    cpu_count="$(nproc)"
+    rm -rf ./build
+
     package_name='GgmlOpPackage'
-    make all -j$cpu_count PACKAGE_NAME=$package_name
-    make htp_v73 -j$cpu_count PACKAGE_NAME=$package_name
-    make htp_v75 -j$cpu_count PACKAGE_NAME=$package_name
-    make htp_v79 -j$cpu_count PACKAGE_NAME=$package_name
+    ANDROID_NDK_ROOT=$ANDROID_NDK_HOME make htp_aarch64 -j$_cpu_count PACKAGE_NAME=$package_name
+    rsync -av ./build/aarch64-android/libQnnGgmlOpPackage.so $OUTPUT_DIR/libQnnGgmlOpPackage_aarch64.so
+
+    make htp_v73 -j$_cpu_count PACKAGE_NAME=$package_name
+    rsync -av ./build/hexagon-v73/libQnnGgmlOpPackage.so $OUTPUT_DIR/libQnnGgmlOpPackage_v73.so
+
+    make htp_v75 -j$_cpu_count PACKAGE_NAME=$package_name
+    rsync -av ./build/hexagon-v75/libQnnGgmlOpPackage.so $OUTPUT_DIR/libQnnGgmlOpPackage_v75.so
 fi
 
 set +e

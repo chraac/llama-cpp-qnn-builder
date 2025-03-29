@@ -1,7 +1,9 @@
 services:
   llama-qnn-compile:
     platform: linux/x86_64
-    image: chraac/llama-cpp-qnn-hexagon-builder:latest
+    build: 
+      context: .
+      dockerfile: Dockerfile.compile
     environment:
       ANDROID_PLATFORM: android-31
       TARGET_ARCH: ${TARGET_ARCH} # arm64-v8a, armeabi-v7a, x86_64, x86
