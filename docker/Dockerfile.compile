@@ -1,4 +1,0 @@
-FROM chraac/llama-cpp-qnn-hexagon-builder:latest
-
-RUN apt update
-RUN apt install -y python3 python-is-python3 libncurses5
