@@ -95,18 +95,20 @@ if [ $BUILD_HEXAGON_PACKAGE -eq 1 ]; then
     echo "Building hexagon package"
     source $QNN_SDK_PATH/bin/envsetup.sh
     source $HEXAGON_SDK_PATH/setup_sdk_env.source
-    cd ../ggml/src/ggml-qnn/hexagon/GgmlOpPackage
-    rm -rf ./build
+    cd ../ggml/src/ggml-qnn/npu
 
-    package_name='GgmlOpPackage'
-    ANDROID_NDK_ROOT=$ANDROID_NDK_HOME make htp_aarch64 -j$_cpu_count PACKAGE_NAME=$package_name
-    rsync -av ./build/aarch64-android/libQnnGgmlOpPackage.so $OUTPUT_DIR/libQnnGgmlOpPackage_aarch64.so
+    HEXAGON_BUILD_TYPE="$BUILD_TYPE"
+    if [ "$BUILD_TYPE" = "MinSizeRel" ]; then
+        HEXAGON_BUILD_TYPE="Release"
+    fi
 
-    make htp_v73 -j$_cpu_count PACKAGE_NAME=$package_name
-    rsync -av ./build/hexagon-v73/libQnnGgmlOpPackage.so $OUTPUT_DIR/libQnnGgmlOpPackage_v73.so
+    rm -rf ./hexagon_*
+    build_cmake hexagon DSP_ARCH=v73 BUILD=$HEXAGON_BUILD_TYPE VERBOSE=1 TREE=1 -j$_cpu_count
+    rsync -av ./hexagon_${HEXAGON_BUILD_TYPE}_toolv87_v73/libhexagon_npu_skel_v73.so $OUTPUT_DIR/
 
-    make htp_v75 -j$_cpu_count PACKAGE_NAME=$package_name
-    rsync -av ./build/hexagon-v75/libQnnGgmlOpPackage.so $OUTPUT_DIR/libQnnGgmlOpPackage_v75.so
+    rm -rf ./hexagon_*
+    build_cmake hexagonsim DSP_ARCH=v73 BUILD=$HEXAGON_BUILD_TYPE VERBOSE=1 TREE=1 -j$_cpu_count
+    rsync -av ./hexagon_${HEXAGON_BUILD_TYPE}_toolv87_v73/libhexagon_npu_skel_v73.so $OUTPUT_DIR/libhexagon_npu_skel_v73_sim.so
 fi
 
 set +e
