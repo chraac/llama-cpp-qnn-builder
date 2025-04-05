@@ -24,6 +24,9 @@ if [ -z "$TARGET_ARCH" ]; then
     exit 1
 fi
 
+source $QNN_SDK_PATH/bin/envsetup.sh
+source $HEXAGON_SDK_PATH/setup_sdk_env.source
+
 # Sync the source code from the mounted directory to the local directory
 mkdir -p $LOCAL_REPO_DIR
 chmod 777 $LOCAL_REPO_DIR
@@ -93,8 +96,6 @@ chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
 
 if [ $BUILD_HEXAGON_PACKAGE -eq 1 ]; then
     echo "Building hexagon package"
-    source $QNN_SDK_PATH/bin/envsetup.sh
-    source $HEXAGON_SDK_PATH/setup_sdk_env.source
     cd ../ggml/src/ggml-qnn/npu
 
     HEXAGON_BUILD_TYPE="$BUILD_TYPE"

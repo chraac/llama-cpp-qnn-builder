@@ -83,6 +83,13 @@ while (("$#")); do
     esac
 done
 
+if [ $_enable_hexagon_package -eq 1 ]; then
+    export BUILD_HEXAGON_PACKAGE=1
+    _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_HEXAGON_PACKAGE=on"
+else
+    export BUILD_HEXAGON_PACKAGE=0
+fi
+
 _build_options="${_build_options} ${_extra_build_options}"
 
 set -e
@@ -132,12 +139,6 @@ export HOST_USER_ID=$_user_id
 export TARGET_PLATFORM=$_build_platform
 export TARGET_ARCH=$_build_arch
 export CMAKE_EXTRA_BUILD_OPTIONS=$_build_options
-
-if [ $_enable_hexagon_package -eq 1 ]; then
-    export BUILD_HEXAGON_PACKAGE=1
-else
-    export BUILD_HEXAGON_PACKAGE=0
-fi
 
 _extra_args='--exit-code-from llama-qnn-compile'
 _compose_command='docker compose -f docker-compose-compile.yml'
