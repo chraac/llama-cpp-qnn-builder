@@ -57,6 +57,10 @@ while (("$#")); do
         _print_build_time=1
         shift
         ;;
+    --asan)
+        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+        shift
+        ;;
     --build-linux-x64)
         _build_platform='linux'
         _build_arch='x86_64'
