@@ -4,7 +4,8 @@ param (
     [int]$_port = 23456,
     [string]$_parameters = 'test',
     [switch]$_should_forward_port = $false,
-    [string]$_executable_name = 'test-backend-ops'
+    [string]$_executable_name = 'test-backend-ops',
+    [string]$_variables = "LLAMA_CACHE=$_device_path/cache"
 )
 
 # loop through the arguments
@@ -20,7 +21,9 @@ for ($i = 0; $i -lt $args.Length; $i++) {
     }
 }
 
-$job = Start-job { adb shell $args[0] } -ArgumentList "cd $_device_path && ./gdbserver :$_port ./$_executable_name $_parameters"
+Write-Host "Parameters: $_parameters"
+
+$job = Start-job { adb shell $args[0] } -ArgumentList "cd $_device_path && $_variables ./gdbserver :$_port ./$_executable_name $_parameters"
 
 if ($_should_forward_port) {
     adb forward tcp:$_port tcp:$_port
