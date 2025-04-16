@@ -92,6 +92,12 @@ chmod -R u+rw $OUTPUT_DIR
 rsync -av ./bin/llama-* $OUTPUT_DIR
 rsync -av ./bin/test-backend-ops $OUTPUT_DIR
 rsync -av ./bin/*.so $OUTPUT_DIR
+if [ -e ./bin/lldb-server ]; then
+    rsync -av ./bin/lldb-server $OUTPUT_DIR
+else
+    rsync -av ./bin/gdbserver $OUTPUT_DIR
+fi
+
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
 
 if [ $BUILD_HEXAGON_PACKAGE -eq 1 ]; then
