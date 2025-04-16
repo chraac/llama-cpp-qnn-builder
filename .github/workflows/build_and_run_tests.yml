@@ -70,5 +70,5 @@ jobs:
       - name: Build
         run: |
           cd llama.cpp
-          cmake --preset "${env:QNN_BUILD_PRESET}" -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DGGML_QNN_SDK_PATH="${env:QNN_SDK_PATH}"
+          cmake --preset "${env:QNN_BUILD_PRESET}" -DGGML_OPENMP=OFF -DGGML_QNN=ON -DBUILD_SHARED_LIBS=OFF -DLLAMA_CURL=OFF -DGGML_QNN_SDK_PATH="${env:QNN_SDK_PATH}"
           cmake --build "build-${env:QNN_BUILD_PRESET}" --clean-first -j ${env:NUMBER_OF_PROCESSORS}
