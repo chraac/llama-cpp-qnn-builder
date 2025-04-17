@@ -13,10 +13,11 @@ _pull_latest=0
 _print_build_time=0
 _build_platform='android' # default build platform, could be 'android' or 'linux'
 _build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
-_build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on -DLLAMA_CURL=OFF'
+_build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on -DLLAMA_CURL=off'
 _extra_build_options=''
 _run_backend_tests=0
 _enable_hexagon_package=0
+_hexagon_npu_only=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -76,6 +77,10 @@ while (("$#")); do
         _enable_hexagon_package=1
         shift
         ;;
+    --hexagon-npu-only)
+        _hexagon_npu_only=1
+        shift
+        ;;
     --run-tests)
         _run_backend_tests=1
         shift
@@ -92,6 +97,13 @@ if [ $_enable_hexagon_package -eq 1 ]; then
     _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_HEXAGON_PACKAGE=on"
 else
     export BUILD_HEXAGON_PACKAGE=0
+fi
+
+if [ $_hexagon_npu_only -eq 1 ]; then
+    export BUILD_HEXAGON_NPU_ONLY=1
+    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_NPU_ONLY=on"
+else
+    export BUILD_HEXAGON_NPU_ONLY=0
 fi
 
 _build_options="${_build_options} ${_extra_build_options}"
