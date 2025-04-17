@@ -38,7 +38,7 @@ if ($PushToDevice) {
 
 # Build the device command string
 $deviceCommandString = "cd $deviceExecPath && "
-$deviceCommandString += "LLAMA_CACHE=$deviceExecPath/cache "
+$deviceCommandString += "LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
 $deviceCommandString += "./llama-cli $extraArgs -m `"$deviceModelPath/$ModelName`" --no-mmap --color -i -r `"User:`""
 
 # Execute the ADB command

@@ -5,7 +5,7 @@ param (
     [string]$_parameters = 'test',
     [switch]$_should_forward_port = $false,
     [string]$_executable_name = 'test-backend-ops',
-    [string]$_variables = "LLAMA_CACHE=$_device_path/cache"
+    [string]$_variables = "LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./"
 )
 
 # loop through the arguments
