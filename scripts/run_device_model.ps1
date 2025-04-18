@@ -20,7 +20,7 @@ foreach ($arg in $args) {
         '--push-to-device' { $PushToDevice = $true }
         default {
             # Skip argument values that follow parameter names
-            if ($args[$args.IndexOf($arg) - 1] -notin @('-m', '--model-name', -v, '--verbose', '-p', '--push-to-device')) {
+            if ($args[$args.IndexOf($arg) - 1] -notin @('-m', '--model-name', '-v', '--verbose', '-p', '--push-to-device')) {
                 Write-Host "Invalid option $arg"
                 exit 1
             }
