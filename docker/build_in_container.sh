@@ -104,17 +104,19 @@ function build_hexagon_libs() {
     local dsp_arch=$1
     local build_sim=$2
 
-    if [ -z "$build_sim" ]; then
-        build_type="hexagon"
+    local postfix=''
+    if [ "$build_sim" = "0" ]; then
+        build_type='hexagon'
     else
-        build_type="hexagonsim"
+        build_type='hexagonsim'
+        postfix='_sim'
     fi
 
     echo "Building ${build_type} libs for $dsp_arch"
 
     rm -rf ./hexagon_*
     build_cmake ${build_type} DSP_ARCH=$dsp_arch BUILD=$HEXAGON_BUILD_TYPE VERBOSE=1 TREE=1 -j$_cpu_count
-    rsync -av ./hexagon_${HEXAGON_BUILD_TYPE}_toolv87_${dsp_arch}/libhexagon_npu_skel_${dsp_arch}.so $OUTPUT_DIR/
+    rsync -av ./hexagon_${HEXAGON_BUILD_TYPE}_toolv87_${dsp_arch}/libhexagon_npu_skel_${dsp_arch}.so $OUTPUT_DIR/libhexagon_npu_skel_${dsp_arch}${postfix}.so
 }
 
 if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
