@@ -16,7 +16,7 @@ _build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
 _build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on -DLLAMA_CURL=off'
 _extra_build_options=''
 _run_backend_tests=0
-_enable_hexagon_package=0
+_enable_hexagon_backend=0
 _hexagon_npu_only=0
 
 # Parse command-line arguments
@@ -73,8 +73,8 @@ while (("$#")); do
         _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_PERFORMANCE_TRACKING=on"
         shift
         ;;
-    --enable-hexagon-package)
-        _enable_hexagon_package=1
+    --enable-hexagon-backend)
+        _enable_hexagon_backend=1
         shift
         ;;
     --hexagon-npu-only)
@@ -92,9 +92,9 @@ while (("$#")); do
     esac
 done
 
-if [ $_enable_hexagon_package -eq 1 ]; then
+if [ $_enable_hexagon_backend -eq 1 ]; then
     export BUILD_HEXAGON_PACKAGE=1
-    _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_HEXAGON_PACKAGE=on"
+    _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_HEXAGON_BACKEND=on"
 else
     export BUILD_HEXAGON_PACKAGE=0
 fi
