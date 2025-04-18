@@ -1,13 +1,13 @@
 param (
     [string]$ModelName = 'meta-llama_Meta-Llama-3.2-1B-Instruct-f32.gguf',
     [switch]$Verbose,
-    [switch]$PushToDevice
+    [switch]$PushToDevice,
+    [string]$ExtraArgs = ''  # Add extraArgs parameter with default empty string
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $deviceExecPath = '/data/local/tmp'
 $deviceModelPath = '/data/local/tmp'
-$extraArgs = ''
 
 # Process non-parameter arguments for backward compatibility
 foreach ($arg in $args) {
@@ -28,18 +28,17 @@ foreach ($arg in $args) {
     }
 }
 
-if ($Verbose) {
-    $extraArgs = "-v"
+# Set ExtraArgs based on Verbose if not explicitly provided
+if ($Verbose -and $ExtraArgs -eq '') {
+    $ExtraArgs = "-v"
 }
 
 if ($PushToDevice) {
     & "$scriptPath/push_and_run_test.ps1" -p
 }
 
-# Build the device command string
 $deviceCommandString = "cd $deviceExecPath && "
 $deviceCommandString += "LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-$deviceCommandString += "./llama-cli $extraArgs -m `"$deviceModelPath/$ModelName`" --no-mmap --color -i -r `"User:`""
+$deviceCommandString += "./llama-cli $ExtraArgs -m `"$deviceModelPath/$ModelName`" --no-mmap --color -i -r `"User:`""
 
-# Execute the ADB command
 adb shell $deviceCommandString
