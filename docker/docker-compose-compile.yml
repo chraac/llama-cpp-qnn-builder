@@ -12,6 +12,7 @@ services:
       LOCAL_REPO_DIR: "/llama_cpp"
       CMAKE_EXTRA_BUILD_OPTIONS: ${CMAKE_EXTRA_BUILD_OPTIONS}
       BUILD_HEXAGON_BACKEND: ${BUILD_HEXAGON_BACKEND}
+      BUILD_HEXAGON_NPU_ONLY: ${BUILD_HEXAGON_NPU_ONLY}
     volumes:
       - ${LLAMA_CPP_REPO}:/mnt/llama_cpp_mount:ro
       - ${OUTPUT_PATH}:/mnt/output:rw

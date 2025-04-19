@@ -6,6 +6,7 @@ echo "LOCAL_REPO_DIR: $LOCAL_REPO_DIR"
 echo "QNN_SDK_PATH: $QNN_SDK_PATH"
 echo "HEXAGON_SDK_PATH: $HEXAGON_SDK_PATH"
 echo "BUILD_HEXAGON_BACKEND: $BUILD_HEXAGON_BACKEND"
+echo "BUILD_HEXAGON_NPU_ONLY: $BUILD_HEXAGON_NPU_ONLY"
 echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
 echo "TARGET_PLATFORM: $TARGET_PLATFORM"
 echo "TARGET_ARCH: $TARGET_ARCH"
@@ -77,6 +78,14 @@ elif [ "$TARGET_PLATFORM" = "linux" ]; then
 else
     echo "TARGET_PLATFORM is not android or linux"
     exit 1
+fi
+
+if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
+    _extra_options="${_extra_options} -DGGML_QNN_ENABLE_HEXAGON_BACKEND=on"
+fi
+
+if [ $BUILD_HEXAGON_NPU_ONLY -eq 1 ]; then
+    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_NPU_ONLY=on"
 fi
 
 # Build llama

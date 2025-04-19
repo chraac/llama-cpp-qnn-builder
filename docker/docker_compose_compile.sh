@@ -94,7 +94,6 @@ done
 
 if [ $_enable_hexagon_backend -eq 1 ]; then
     export BUILD_HEXAGON_BACKEND=1
-    _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_HEXAGON_BACKEND=on"
 else
     export BUILD_HEXAGON_BACKEND=0
 fi
@@ -102,7 +101,6 @@ fi
 if [ $_hexagon_npu_only -eq 1 ]; then
     export BUILD_HEXAGON_NPU_ONLY=1
     export BUILD_HEXAGON_BACKEND=1
-    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_NPU_ONLY=on"
 else
     export BUILD_HEXAGON_NPU_ONLY=0
 fi
