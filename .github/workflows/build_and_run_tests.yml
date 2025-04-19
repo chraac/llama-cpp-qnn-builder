@@ -22,7 +22,7 @@ jobs:
           git submodule update --init --recursive --checkout
           git submodule update --recursive
       - name: Build Linux Debug
-        run: docker/docker_compose_compile.sh -r -d --print-build-time --build-linux-x64
+        run: docker/docker_compose_compile.sh -r -d --print-build-time --build-linux-x64 --qnn-only
       - name: Run test-backend-ops cpu
         run: docker/docker_compose_run_test.sh -b cpu
   build-android-qnn:
@@ -38,9 +38,9 @@ jobs:
           git submodule update --init --recursive --checkout
           git submodule update --recursive
       - name: Build Debug
-        run: docker/docker_compose_compile.sh -r -d --print-build-time
+        run: docker/docker_compose_compile.sh -r -d --print-build-time --qnn-only
       - name: Build Release
-        run: docker/docker_compose_compile.sh -r --print-build-time
+        run: docker/docker_compose_compile.sh -r --print-build-time --qnn-only
   build-windows-qnn:
     timeout-minutes: 20
     runs-on: windows-latest
