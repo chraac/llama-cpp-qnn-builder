@@ -1,0 +1,21 @@
+services:
+  llama-qnn-compile:
+    platform: linux/x86_64
+    image: chraac/llama-cpp-qnn-builder:latest
+    environment:
+      ANDROID_PLATFORM: android-31
+      TARGET_ARCH: ${TARGET_ARCH} # arm64-v8a, armeabi-v7a, x86_64, x86
+      TARGET_PLATFORM: ${TARGET_PLATFORM} # android or linux
+      BUILD_TYPE: ${BUILD_TYPE}
+      HOST_USER_ID: ${HOST_USER_ID}
+      OUTPUT_DIR: /mnt/output
+      LOCAL_REPO_DIR: "/llama_cpp"
+      CMAKE_EXTRA_BUILD_OPTIONS: ${CMAKE_EXTRA_BUILD_OPTIONS}
+      BUILD_HEXAGON_BACKEND: 0
+      BUILD_HEXAGON_NPU_ONLY: 0
+    volumes:
+      - ${LLAMA_CPP_REPO}:/mnt/llama_cpp_mount:ro
+      - ${OUTPUT_PATH}:/mnt/output:rw
+      - ./build_in_container.sh:/mnt/build_in_container.sh:rx
+    command: bash -c /mnt/build_in_container.sh
+    restart: "no"

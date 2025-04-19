@@ -18,6 +18,7 @@ _extra_build_options=''
 _run_backend_tests=0
 _enable_hexagon_backend=0
 _hexagon_npu_only=0
+_qnn_only=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -79,6 +80,10 @@ while (("$#")); do
         ;;
     --hexagon-npu-only)
         _hexagon_npu_only=1
+        shift
+        ;;
+    --qnn-only)
+        _qnn_only=1
         shift
         ;;
     --run-tests)
@@ -155,8 +160,13 @@ export TARGET_PLATFORM=$_build_platform
 export TARGET_ARCH=$_build_arch
 export CMAKE_EXTRA_BUILD_OPTIONS=$_build_options
 
+_docker_compose_file="docker-compose-compile.yml"
+if [ $_qnn_only -eq 1 ]; then
+    _docker_compose_file="docker-compose-compile-qnn.yml"
+fi
+
 _extra_args='--exit-code-from llama-qnn-compile'
-_compose_command='docker compose -f docker-compose-compile.yml'
+_compose_command="docker compose -f $_docker_compose_file"
 if [ $_pull_latest -eq 1 ]; then
     echo 'Pull latest image'
     $_compose_command stop
