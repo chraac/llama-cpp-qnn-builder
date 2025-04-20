@@ -103,7 +103,7 @@ rsync -av ./bin/test-backend-ops $OUTPUT_DIR
 rsync -av ./bin/*.so $OUTPUT_DIR
 if [ -e ./bin/lldb-server ]; then
     rsync -av ./bin/lldb-server $OUTPUT_DIR
-else
+elif [ -e ./bin/gdbserver ]; then
     rsync -av ./bin/gdbserver $OUTPUT_DIR
 fi
 
