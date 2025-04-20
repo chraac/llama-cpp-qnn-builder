@@ -45,6 +45,11 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Checkout
         uses: actions/checkout@v1
       - name: Update Submodule
@@ -53,11 +58,6 @@ jobs:
           git submodule foreach --recursive git reset --hard
           git submodule update --init --recursive --checkout
           git submodule update --recursive
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Debug
         run: docker/docker_compose_compile.sh -r -d --print-build-time --enable-hexagon-backend
   build-windows-qnn:
