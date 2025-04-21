@@ -55,7 +55,7 @@ function run_benchmark() {
     # adb shell 'cd /data/local/tmp/ && LLAMA_CACHE=/data/local/tmp/cache ./llama-bench --progress -v -mmp 0 -m meta-llama_Meta-Llama-3.2-1B-Instruct-f32.gguf' > llama-bench-f32-qnn-gpu-debug.log 2>&1
     local model_name=$1
     local command_string="cd $_device_path && "
-    command_string+="LLAMA_CACHE=$_device_path/cache "
+    command_string+="LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
     command_string+="./llama-bench --progress ${extra_args} -mmp 0 -p 512 -n 128 -m $model_name"
     adb shell $command_string
 }

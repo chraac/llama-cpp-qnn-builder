@@ -1,32 +1,67 @@
-
 param (
-    [switch]$_pushToDevice = $false
+    [switch]$PushToDevice,
+    [string]$ExtraArgs = "test",
+    [string]$LogFileName = "test-backend-ops_all"
 )
 
-$_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$_devicePath = '/data/local/tmp'
-$_logFilePath = "$_scriptPath/../run_logs/test-backend-ops_all.log"
+$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$devicePath = '/data/local/tmp'
+$logFileExtension = ".log"
+$logFilePath = "$scriptPath/../run_logs/${LogFileName}${logFileExtension}"
+$logcatOutputPath = "$scriptPath/../run_logs/${LogFileName}_logcat${logFileExtension}"
+$extraRunVars = "LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./"
 
-# Check arguments if not using named parameters
+# Process non-parameter arguments for backward compatibility
 foreach ($arg in $args) {
-    if ($arg -eq '--push-to-device') {
-        $_pushToDevice = $true
-    } else {
-        Write-Error "Invalid option $arg"
-        exit 1
+    switch ($arg) {
+        '-p' { $PushToDevice = $true }
+        '--push-to-device' { $PushToDevice = $true }
+        '--extra-args' { 
+            $ExtraArgs = $args[$args.IndexOf($arg) + 1]
+        }
+        '--log-file-name' { 
+            $LogFileName = $args[$args.IndexOf($arg) + 1]
+            $logFilePath = "$scriptPath/../run_logs/${LogFileName}${logFileExtension}"
+            $logcatOutputPath = "$scriptPath/../run_logs/${LogFileName}_logcat${logFileExtension}"
+        }
+        default {
+            if ($args[$args.IndexOf($arg) - 1] -notin @('--extra-args', '--log-file-name')) {
+                Write-Error "Invalid option $arg"
+                exit 1
+            }
+        }
     }
 }
 
 # Create logs directory if it doesn't exist
-$logDir = Split-Path -Parent $_logFilePath
-if (-not (Test-Path $logDir)) {
+$logDir = Split-Path -Parent $logFilePath
+if (!(Test-Path -Path $logDir)) {
     New-Item -ItemType Directory -Path $logDir -Force | Out-Null
 }
 
-if ($_pushToDevice) {
-    & "$_scriptPath/push_and_run_test.ps1" -p
+if ($PushToDevice) {
+    & "$scriptPath/push_and_run_test.ps1" -p
 }
 
-# Run the test and redirect output to log file
-$commandString = "cd $_devicePath && LLAMA_CACHE=$_devicePath/cache ./test-backend-ops test"
-adb shell $commandString 2>&1 | Out-File -FilePath $_logFilePath
+# Clear logcat
+adb logcat -c
+
+# Start logcat in background process
+$logcatProcess = Start-Process -FilePath "adb" -ArgumentList "logcat" -NoNewWindow -RedirectStandardOutput "$env:TEMP\logcat_temp.log" -PassThru
+
+# Run the test command
+$testCmd = "cd $devicePath && $extraRunVars ./test-backend-ops $ExtraArgs"
+adb shell $testCmd 2>&1 | Out-File -FilePath $logFilePath
+
+# Stop the logcat process
+if ($null -ne $logcatProcess -and !$logcatProcess.HasExited) {
+    $logcatProcess.Kill()
+}
+
+# Filter the logcat output and save to the output file
+if (Test-Path "$env:TEMP\logcat_temp.log") {
+    Get-Content "$env:TEMP\logcat_temp.log" | 
+    Select-String -Pattern "adsprpc|pid-" | 
+    Out-File -FilePath $logcatOutputPath
+    Remove-Item "$env:TEMP\logcat_temp.log" -Force
+}

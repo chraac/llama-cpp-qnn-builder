@@ -13,9 +13,12 @@ _pull_latest=0
 _print_build_time=0
 _build_platform='android' # default build platform, could be 'android' or 'linux'
 _build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
-_build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on -DLLAMA_CURL=OFF'
+_build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on -DLLAMA_CURL=off'
 _extra_build_options=''
 _run_backend_tests=0
+_enable_hexagon_backend=0
+_hexagon_npu_only=0
+_qnn_only=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -56,6 +59,10 @@ while (("$#")); do
         _print_build_time=1
         shift
         ;;
+    --asan)
+        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+        shift
+        ;;
     --build-linux-x64)
         _build_platform='linux'
         _build_arch='x86_64'
@@ -65,6 +72,18 @@ while (("$#")); do
         ;;
     --perf-log)
         _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_PERFORMANCE_TRACKING=on"
+        shift
+        ;;
+    --enable-hexagon-backend)
+        _enable_hexagon_backend=1
+        shift
+        ;;
+    --hexagon-npu-only)
+        _hexagon_npu_only=1
+        shift
+        ;;
+    --qnn-only)
+        _qnn_only=1
         shift
         ;;
     --run-tests)
@@ -77,6 +96,19 @@ while (("$#")); do
         ;;
     esac
 done
+
+if [ $_enable_hexagon_backend -eq 1 ]; then
+    export BUILD_HEXAGON_BACKEND=1
+else
+    export BUILD_HEXAGON_BACKEND=0
+fi
+
+if [ $_hexagon_npu_only -eq 1 ]; then
+    export BUILD_HEXAGON_NPU_ONLY=1
+    export BUILD_HEXAGON_BACKEND=1
+else
+    export BUILD_HEXAGON_NPU_ONLY=0
+fi
 
 _build_options="${_build_options} ${_extra_build_options}"
 
@@ -128,8 +160,13 @@ export TARGET_PLATFORM=$_build_platform
 export TARGET_ARCH=$_build_arch
 export CMAKE_EXTRA_BUILD_OPTIONS=$_build_options
 
+_docker_compose_file="docker-compose-compile.yml"
+if [ $_qnn_only -eq 1 ]; then
+    _docker_compose_file="docker-compose-compile-qnn.yml"
+fi
+
 _extra_args='--exit-code-from llama-qnn-compile'
-_compose_command='docker compose -f docker-compose-compile.yml'
+_compose_command="docker compose -f $_docker_compose_file"
 if [ $_pull_latest -eq 1 ]; then
     echo 'Pull latest image'
     $_compose_command stop
