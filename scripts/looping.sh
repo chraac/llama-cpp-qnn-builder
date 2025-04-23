@@ -72,3 +72,35 @@ run_for() {
     total_time=$((current_time - start_time))
     echo "Finished after ${total_time}s with $run_count executions"
 }
+
+# Repeatedly run a command until Ctrl+C is pressed, then show total runtime
+# Usage: repeat_cmd COMMAND [ARGS...]
+repeat_cmd() {
+    if [ -z "$1" ]; then
+        echo "Error: No command specified"
+        echo "Usage: repeat_cmd COMMAND [ARGS...]"
+        return 1
+    fi
+
+    local start_time=$(date +%s)
+    local count=0
+
+    trap 'elapsed=$(($(date +%s) - start_time)); echo; echo "Total runtime: ${elapsed}s (${count} executions)"; return 0' INT
+
+    while true; do
+        count=$((count + 1))
+        echo "[$(date '+%H:%M:%S')] Run #${count}"
+
+        local cmd_start=$(date +%s)
+        eval "$@"
+        local cmd_end=$(date +%s)
+
+        echo "Command took $((cmd_end - cmd_start)) seconds"
+        echo
+        sleep 1
+    done
+}
+
+_script_dir="$(dirname "$(realpath "$0")")"
+_working_dir="$(pwd)"
+repeat_cmd "clear && $_script_dir/../docker/docker_compose_compile.sh --print-build-time --repo-dir '${_working_dir}' -r --hexagon-npu-only -d"
