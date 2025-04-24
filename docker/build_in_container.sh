@@ -7,6 +7,7 @@ echo "QNN_SDK_PATH: $QNN_SDK_PATH"
 echo "HEXAGON_SDK_PATH: $HEXAGON_SDK_PATH"
 echo "BUILD_HEXAGON_BACKEND: $BUILD_HEXAGON_BACKEND"
 echo "BUILD_HEXAGON_NPU_ONLY: $BUILD_HEXAGON_NPU_ONLY"
+echo "DISABLE_HEXAGON_AND_QNN: $DISABLE_HEXAGON_AND_QNN"
 echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
 echo "TARGET_PLATFORM: $TARGET_PLATFORM"
 echo "TARGET_ARCH: $TARGET_ARCH"
@@ -88,9 +89,14 @@ if [ $BUILD_HEXAGON_NPU_ONLY -eq 1 ]; then
     _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_NPU_ONLY=on"
 fi
 
+if [ $DISABLE_HEXAGON_AND_QNN -eq 1 ]; then
+    _extra_options="${_extra_options} -DGGML_QNN=off"
+else
+    _extra_options="${_extra_options} -DGGML_QNN=on"
+fi
+
 # Build llama
-cmake -H.. -B. \
-    -DGGML_QNN=on $_extra_options \
+cmake -H.. -B. $_extra_options \
     -DGGML_QNN_SDK_PATH="$QNN_SDK_PATH" \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
@@ -98,13 +104,17 @@ cmake --build . --config $BUILD_TYPE -- -j$_cpu_count
 
 # Copy the output files to the output directory
 chmod -R u+rw $OUTPUT_DIR
+
 rsync -av ./bin/llama-* $OUTPUT_DIR
 rsync -av ./bin/test-backend-ops $OUTPUT_DIR
-rsync -av ./bin/*.so $OUTPUT_DIR
 if [ -e ./bin/lldb-server ]; then
     rsync -av ./bin/lldb-server $OUTPUT_DIR
 elif [ -e ./bin/gdbserver ]; then
     rsync -av ./bin/gdbserver $OUTPUT_DIR
+fi
+
+if [ $DISABLE_HEXAGON_AND_QNN -eq 0 ]; then
+    rsync -av ./bin/*.so $OUTPUT_DIR
 fi
 
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
@@ -128,7 +138,7 @@ function build_hexagon_libs() {
     rsync -av ./hexagon_${HEXAGON_BUILD_TYPE}_toolv87_${dsp_arch}/libhexagon_npu_skel_${dsp_arch}.so $OUTPUT_DIR/libhexagon_npu_skel_${dsp_arch}${postfix}.so
 }
 
-if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
+if [ $BUILD_HEXAGON_BACKEND -eq 1 ] && [ $DISABLE_HEXAGON_AND_QNN -eq 0 ]; then
     echo "Building hexagon package"
     cd ../ggml/src/ggml-qnn/npu
 
