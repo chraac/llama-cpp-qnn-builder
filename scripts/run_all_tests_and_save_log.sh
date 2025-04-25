@@ -47,6 +47,6 @@ LOGCAT_PID=$!
 
 adb shell "cd $_DEVICE_PATH && $_EXTRA_RUN_VARS ./test-backend-ops $_EXTRA_RUN_ARGS" >$_LOG_FILE_PATH 2>&1
 
-sleep 5
+sleep 10
 
 kill $LOGCAT_PID
