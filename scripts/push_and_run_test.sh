@@ -25,6 +25,7 @@ push_executable() {
 push_executable 'test-backend-ops'
 push_executable 'llama-cli'
 push_executable 'llama-bench'
+push_executable 'sysMonApp'
 
 push_debug_server() {
     local server_name=$1

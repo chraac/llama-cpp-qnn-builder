@@ -113,6 +113,10 @@ elif [ -e ./bin/gdbserver ]; then
     rsync -av ./bin/gdbserver $OUTPUT_DIR
 fi
 
+if [ -e ./bin/sysMonApp ]; then
+    rsync -av ./bin/sysMonApp $OUTPUT_DIR
+fi
+
 if [ $DISABLE_HEXAGON_AND_QNN -eq 0 ]; then
     rsync -av ./bin/*.so $OUTPUT_DIR
 fi
