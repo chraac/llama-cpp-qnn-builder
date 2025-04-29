@@ -2,6 +2,7 @@
 
 _script_path=$(dirname "$(realpath "$0")")
 _device_path='/data/local/tmp'
+_device_model_path='/sdcard'
 _log_file_name='llama-bench-batch-qnn-gpu-debug.log'
 _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf' 'meta-llama_Meta-Llama-3.2-3B-Instruct-Q4_K_M.gguf' 'meta-llama_Meta-Llama-3-8B-Instruct-Q4_K_M.gguf')
 _should_push_to_device=0
@@ -56,7 +57,7 @@ function run_benchmark() {
     local model_name=$1
     local command_string="cd $_device_path && "
     command_string+="LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-    command_string+="./llama-bench --progress ${extra_args} -mmp 0 -p 512 -n 128 -m $model_name"
+    command_string+="./llama-bench --progress ${extra_args} -mmp 0 -p 512 -n 128 -m ${_device_model_path}/$model_name"
     adb shell $command_string
 }
 

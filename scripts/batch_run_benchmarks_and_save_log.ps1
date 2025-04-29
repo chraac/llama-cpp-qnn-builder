@@ -7,6 +7,7 @@ param (
 
 $_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $_devicePath = '/data/local/tmp'
+$_deviceModelPath = '/sdcard'
 $_modelList = @(
     'meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf', 
     'meta-llama_Meta-Llama-3.2-3B-Instruct-Q4_K_M.gguf', 
@@ -69,7 +70,7 @@ function Run-Benchmark {
     
     $commandString = "cd $_devicePath && "
     $commandString += "LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-    $commandString += "./llama-bench --progress ${extraArgs} -mmp 0 -p 512 -n 128 -m $modelName"
+    $commandString += "./llama-bench --progress ${extraArgs} -mmp 0 -p 512 -n 128 -m ${_deviceModelPath}/$modelName"
     adb shell "$commandString"
 }
 

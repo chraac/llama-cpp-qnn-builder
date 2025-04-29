@@ -7,7 +7,7 @@ param (
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $deviceExecPath = '/data/local/tmp'
-$deviceModelPath = '/data/local/tmp'
+$deviceModelPath = '/sdcard'
 
 # Process non-parameter arguments for backward compatibility
 foreach ($arg in $args) {
