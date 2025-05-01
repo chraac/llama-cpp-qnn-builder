@@ -42,7 +42,7 @@ if [ $_SHOULD_PUSH_TO_DEVICE -eq 1 ]; then
 fi
 
 adb logcat -c
-adb logcat | grep -E 'adsprpc|pid-' >$_LOGCAT_OUTPUT_PATH 2>&1 &
+adb logcat -s 'test-backend-ops' >$_LOGCAT_OUTPUT_PATH 2>&1 &
 LOGCAT_PID=$!
 
 adb shell "cd $_DEVICE_PATH && $_EXTRA_RUN_VARS ./test-backend-ops $_EXTRA_RUN_ARGS" >$_LOG_FILE_PATH 2>&1
