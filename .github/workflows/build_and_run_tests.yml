@@ -64,7 +64,7 @@ jobs:
     timeout-minutes: 20
     runs-on: windows-latest
     env:
-      QNN_VERSION: 2.31.0.250130
+      QNN_VERSION: 2.33.0.250327
       QNN_BASE_PATH: 'C:\qnn_sdk'
       QNN_BUILD_PRESET: arm64-windows-llvm-debug
     steps:
@@ -83,7 +83,7 @@ jobs:
       - name: Install Qualcomm Ai Engine SDK
         id: get_qnn_sdk
         run: |
-          curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/qualcomm_neural_processing_sdk/v${env:QNN_VERSION}.zip"
+          curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/${env:QNN_VERSION}/v${env:QNN_VERSION}.zip"
           7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -o"${env:QNN_BASE_PATH}"
           Add-Content $env:GITHUB_ENV "QNN_SDK_PATH=${env:QNN_BASE_PATH}/qairt/${env:QNN_VERSION}"
       - name: Build
