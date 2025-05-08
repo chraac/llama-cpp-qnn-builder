@@ -28,7 +28,7 @@ while [[ $# -gt 0 ]]; do
         _verbose_log=1
         shift
         ;;
-    --skip_8b)
+    --skip-8b)
         _skip_8b=1
         shift
         ;;

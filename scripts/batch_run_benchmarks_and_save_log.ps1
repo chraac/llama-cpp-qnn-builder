@@ -2,51 +2,32 @@ param (
     [string]$LogFileName = 'llama-bench-batch-qnn-gpu-debug.log',
     [switch]$PushToDevice,
     [switch]$Verbose,
-    [switch]$Skip8b
+    [switch]$Skip8b,
+    [switch]$TestQ4
 )
 
 $_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $_devicePath = '/data/local/tmp'
 $_deviceModelPath = '/sdcard'
 $_modelList = @(
-    'meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf', 
-    'meta-llama_Meta-Llama-3.2-3B-Instruct-Q4_K_M.gguf', 
-    'meta-llama_Meta-Llama-3-8B-Instruct-Q4_K_M.gguf'
+    'meta-llama_Meta-Llama-3.2-1B-Instruct', 
+    'meta-llama_Meta-Llama-3.2-3B-Instruct', 
+    'meta-llama_Meta-Llama-3-8B-Instruct'
 )
-
-# Parse non-parameter arguments for backward compatibility
-foreach ($arg in $args) {
-    switch ($arg) {
-        '--log-file-name' { 
-            $LogFileName = $args[$args.IndexOf($arg) + 1]
-        }
-        '--push-to-device' {
-            $PushToDevice = $true
-        }
-        '--verbose' {
-            $Verbose = $true
-        }
-        '--skip_8b' {
-            $Skip8b = $true
-        }
-        default {
-            # Skip argument values that follow parameter names
-            if ($args[$args.IndexOf($arg) - 1] -ne '--log-file-name') {
-                Write-Host "Invalid option $arg"
-                exit 1
-            }
-        }
-    }
-}
+$_quantType = 'Q4_K_M'
 
 if ($PushToDevice) {
     & "$_scriptPath/push_and_run_test.ps1" -p
 }
 
+if ($TestQ4) {
+    $_quantType = 'Q4_0'
+}
+
 if ($Skip8b) {
     $_modelList = @(
-        'meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf', 
-        'meta-llama_Meta-Llama-3.2-3B-Instruct-Q4_K_M.gguf'
+        'meta-llama_Meta-Llama-3.2-1B-Instruct', 
+        'meta-llama_Meta-Llama-3.2-3B-Instruct'
     )
 }
 
@@ -75,6 +56,7 @@ function Run-Benchmark {
 }
 
 foreach ($model in $_modelList) {
-    "Running benchmark for $model..." | Out-File -FilePath $logFilePath -Append
-    Run-Benchmark -modelName $model 2>&1 | Out-File -FilePath $logFilePath -Append
+    $_model = "$model-${_quantType}.gguf"
+    "Running benchmark for $_model..." | Out-File -FilePath $logFilePath -Append
+    Run-Benchmark -modelName $_model 2>&1 | Out-File -FilePath $logFilePath -Append
 }
