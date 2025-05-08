@@ -25,6 +25,7 @@ function Push-Executable {
 Push-Executable 'test-backend-ops'
 Push-Executable 'llama-cli'
 Push-Executable 'llama-bench'
+Push-Executable 'sysMonApp'
 
 function Push-Debug-Server {
     param (

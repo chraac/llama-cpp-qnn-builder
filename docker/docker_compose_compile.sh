@@ -19,6 +19,7 @@ _run_backend_tests=0
 _enable_hexagon_backend=0
 _hexagon_npu_only=0
 _qnn_only=0
+_disable_hexagon_and_qnn=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -82,6 +83,10 @@ while (("$#")); do
         _hexagon_npu_only=1
         shift
         ;;
+    --disable-hexagon-and-qnn)
+        _disable_hexagon_and_qnn=1
+        shift
+        ;;
     --qnn-only)
         _qnn_only=1
         shift
@@ -143,6 +148,7 @@ echo "output_dir: $_llama_cpp_output_dir"
 echo "build_platform: $_build_platform"
 echo "build_arch: $_build_arch"
 echo "build_type: $_build_type"
+echo "disable_hexagon_and_qnn: $_disable_hexagon_and_qnn"
 echo "------------------------------------------------------------"
 
 if [ $_print_build_time -eq 1 ]; then
@@ -159,6 +165,7 @@ export HOST_USER_ID=$_user_id
 export TARGET_PLATFORM=$_build_platform
 export TARGET_ARCH=$_build_arch
 export CMAKE_EXTRA_BUILD_OPTIONS=$_build_options
+export DISABLE_HEXAGON_AND_QNN=$_disable_hexagon_and_qnn
 
 _docker_compose_file="docker-compose-compile.yml"
 if [ $_qnn_only -eq 1 ]; then
