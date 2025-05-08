@@ -100,7 +100,6 @@ fi
 
 # Build llama
 cmake -H.. -B. $_extra_options \
-    -DGGML_QNN_SDK_PATH="$QNN_SDK_PATH" \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
 cmake --build . --config $BUILD_TYPE -- -j$_cpu_count
