@@ -126,37 +126,4 @@ fi
 
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
 
-function build_hexagon_libs() {
-    local dsp_arch=$1
-    local build_sim=$2
-
-    local postfix=''
-    if [ "$build_sim" = "0" ]; then
-        build_type='hexagon'
-    else
-        build_type='hexagonsim'
-        postfix='_sim'
-    fi
-
-    echo "Building ${build_type} libs for $dsp_arch"
-
-    rm -rf ./hexagon_*
-    build_cmake ${build_type} DSP_ARCH=$dsp_arch BUILD=$HEXAGON_BUILD_TYPE VERBOSE=1 TREE=1 -j$_cpu_count
-    rsync -av ./hexagon_${HEXAGON_BUILD_TYPE}_toolv87_${dsp_arch}/libhexagon_npu_skel_${dsp_arch}.so $OUTPUT_DIR/libhexagon_npu_skel_${dsp_arch}${postfix}.so
-}
-
-if [ $BUILD_HEXAGON_BACKEND -eq 1 ] && [ $DISABLE_HEXAGON_AND_QNN -eq 0 ]; then
-    echo "Building hexagon package"
-    cd ../ggml/src/ggml-qnn/npu
-
-    HEXAGON_BUILD_TYPE="$BUILD_TYPE"
-    if [ "$BUILD_TYPE" = "MinSizeRel" ]; then
-        HEXAGON_BUILD_TYPE="Release"
-    fi
-
-    build_hexagon_libs v73 1
-
-    build_hexagon_libs v75 1
-fi
-
 set +e
