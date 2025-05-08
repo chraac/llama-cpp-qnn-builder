@@ -61,9 +61,8 @@ if [ "$TARGET_PLATFORM" = "android" ]; then
         BUILD_TYPE="MinSizeRel"
         echo "Building for android release $BUILD_TYPE"
     fi
-    # disable openmp for android
+
     _android_ndk_options="-DANDROID_ABI=$TARGET_ARCH \
-        -DGGML_OPENMP='off' \
         -DANDROID_PLATFORM=$ANDROID_PLATFORM \
         -DANDROID_NDK=$ANDROID_NDK_HOME \
         -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake"
@@ -89,10 +88,14 @@ if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
 fi
 
 if [ $BUILD_HEXAGON_NPU_ONLY -eq 1 ]; then
-    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_NPU_ONLY=on"
+    echo "Building for Hexagon NPU only"
+    _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=on"
+else
+    _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=off"
 fi
 
 if [ $DISABLE_HEXAGON_AND_QNN -eq 1 ]; then
+    echo "Building for cpu only"
     _extra_options="${_extra_options} -DGGML_QNN=off"
 else
     _extra_options="${_extra_options} -DGGML_QNN=on"
