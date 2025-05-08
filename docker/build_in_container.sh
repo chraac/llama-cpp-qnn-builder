@@ -27,7 +27,10 @@ if [ -z "$TARGET_ARCH" ]; then
 fi
 
 source $QNN_SDK_PATH/bin/envsetup.sh
-source $HEXAGON_SDK_PATH/setup_sdk_env.source
+
+if [ ! -z "$HEXAGON_SDK_PATH" ]; then
+    source $HEXAGON_SDK_PATH/setup_sdk_env.source
+fi
 
 # Sync the source code from the mounted directory to the local directory
 mkdir -p $LOCAL_REPO_DIR
