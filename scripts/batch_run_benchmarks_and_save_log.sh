@@ -4,10 +4,12 @@ _script_path=$(dirname "$(realpath "$0")")
 _device_path='/data/local/tmp'
 _device_model_path='/sdcard'
 _log_file_name='llama-bench-batch-qnn-gpu-debug.log'
-_model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf' 'meta-llama_Meta-Llama-3.2-3B-Instruct-Q4_K_M.gguf' 'meta-llama_Meta-Llama-3-8B-Instruct-Q4_K_M.gguf')
+_model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-3B-Instruct' 'meta-llama_Meta-Llama-3-8B-Instruct')
 _should_push_to_device=0
 _verbose_log=0
 _skip_8b=0
+_test_q4=0
+_quant_type='Q4_K_M'
 
 # parse arguments to get the log file name
 while [[ $# -gt 0 ]]; do
@@ -30,6 +32,10 @@ while [[ $# -gt 0 ]]; do
         _skip_8b=1
         shift
         ;;
+    --test-q4)
+        _test_q4=1
+        shift
+        ;;
     *)
         echo "Invalid option $1"
         exit 1
@@ -41,8 +47,12 @@ if [ $_should_push_to_device -eq 1 ]; then
     "$_script_path/push_and_run_test.sh" -p
 fi
 
+if [ $_test_q4 -eq 1 ]; then
+    _quant_type='Q4_0'
+fi
+
 if [ $_skip_8b -eq 1 ]; then
-    _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf' 'meta-llama_Meta-Llama-3.2-3B-Instruct-Q4_K_M.gguf')
+    _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-3B-Instruct')
 fi
 
 extra_args=""
@@ -62,6 +72,7 @@ function run_benchmark() {
 }
 
 for model in "${_model_list[@]}"; do
-    echo "Running benchmark for $model..." >>$log_file_path 2>&1
-    run_benchmark $model >>$log_file_path 2>&1
+    _model="${model}-${_quant_type}.gguf"
+    echo "Running benchmark for $_model..." >>$log_file_path 2>&1
+    run_benchmark $_model >>$log_file_path 2>&1
 done
