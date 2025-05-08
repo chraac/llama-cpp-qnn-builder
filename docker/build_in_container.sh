@@ -154,10 +154,8 @@ if [ $BUILD_HEXAGON_BACKEND -eq 1 ] && [ $DISABLE_HEXAGON_AND_QNN -eq 0 ]; then
         HEXAGON_BUILD_TYPE="Release"
     fi
 
-    build_hexagon_libs v73 0
     build_hexagon_libs v73 1
 
-    build_hexagon_libs v75 0
     build_hexagon_libs v75 1
 fi
 
