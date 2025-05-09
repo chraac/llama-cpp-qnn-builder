@@ -15,7 +15,7 @@ _quant_type='Q4_K_M'
 while [[ $# -gt 0 ]]; do
     key="$1"
     case $key in
-    -n | --log-file-name)
+    -l | --log-file-name)
         _log_file_name="$2"
         shift
         shift

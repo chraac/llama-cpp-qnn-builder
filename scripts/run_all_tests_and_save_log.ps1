@@ -5,7 +5,7 @@ param (
     [Alias('-e')]
     [string]$ExtraArgs = "test",
     
-    [Alias('-n')]
+    [Alias('-l')]
     [string]$LogFileName = "test-backend-ops_all"
 )
 
@@ -15,6 +15,9 @@ $logFileExtension = ".log"
 $logFilePath = "$scriptPath/../run_logs/${LogFileName}${logFileExtension}"
 $logcatOutputPath = "$scriptPath/../run_logs/${LogFileName}_logcat${logFileExtension}"
 $extraRunVars = "LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./"
+
+Write-Host "ExtraArgs: $ExtraArgs"
+Write-Host "LogFilePath: $logFilePath"
 
 # Create logs directory if it doesn't exist
 $logDir = Split-Path -Parent $logFilePath

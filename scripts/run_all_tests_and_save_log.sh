@@ -23,7 +23,7 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
-    -n | --log-file-name)
+    -l | --log-file-name)
         _LOG_FILE_NAME="$2"
         _LOG_FILE_PATH="$_SCRIPT_PATH/../run_logs/${_LOG_FILE_NAME}$_LOG_FILE_EXTENSION"
         _LOGCAT_OUTPUT_PATH="$_SCRIPT_PATH/../run_logs/${_LOG_FILE_NAME}_logcat$_LOG_FILE_EXTENSION"

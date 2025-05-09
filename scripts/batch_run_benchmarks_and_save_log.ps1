@@ -2,7 +2,7 @@ param (
     [Alias('-p')] 
     [switch]$PushToDevice,
     
-    [Alias('-n')]
+    [Alias('-l')]
     [string]$LogFileName = 'llama-bench-batch-qnn-gpu-debug.log',
     
     [Alias('-v')]
