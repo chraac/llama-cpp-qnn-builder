@@ -208,4 +208,4 @@ if [ $_print_build_time -eq 1 ]; then
     echo "Total build time: $(($_total_build_time / 60)) min $(($_total_build_time % 60)) sec"
     echo "Total test time: $(($_total_test_time / 60)) min $(($_total_test_time % 60)) sec"
 fi
-echo "All succeeded, revision: $_repo_git_hash"
+echo "All succeeded, build_type: $_build_type, revision: $_repo_git_hash"
