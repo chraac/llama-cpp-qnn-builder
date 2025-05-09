@@ -41,6 +41,9 @@ if [ $_SHOULD_PUSH_TO_DEVICE -eq 1 ]; then
     "$_SCRIPT_PATH/push_and_run_test.sh" -p
 fi
 
+echo "ExtraArgs: $_EXTRA_RUN_ARGS"
+echo "LogFilePath: $_LOG_FILE_PATH"
+
 adb logcat -c
 adb logcat -s 'adsprpc' 'test-backend-ops' >$_LOGCAT_OUTPUT_PATH 2>&1 &
 LOGCAT_PID=$!
