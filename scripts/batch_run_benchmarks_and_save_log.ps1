@@ -1,8 +1,17 @@
 param (
-    [string]$LogFileName = 'llama-bench-batch-qnn-gpu-debug.log',
+    [Alias('-p')] 
     [switch]$PushToDevice,
+    
+    [Alias('-n')]
+    [string]$LogFileName = 'llama-bench-batch-qnn-gpu-debug.log',
+    
+    [Alias('-v')]
     [switch]$Verbose,
+    
+    [Alias('-s')]
     [switch]$Skip8b,
+    
+    [Alias('-t')]
     [switch]$TestQ4
 )
 

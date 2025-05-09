@@ -18,12 +18,12 @@ while [[ $# -gt 0 ]]; do
         _SHOULD_PUSH_TO_DEVICE=1
         shift
         ;;
-    --extra-args)
+    -e | --extra-args)
         _EXTRA_RUN_ARGS="$2"
         shift
         shift
         ;;
-    --log-file-name)
+    -n | --log-file-name)
         _LOG_FILE_NAME="$2"
         _LOG_FILE_PATH="$_SCRIPT_PATH/../run_logs/${_LOG_FILE_NAME}$_LOG_FILE_EXTENSION"
         _LOGCAT_OUTPUT_PATH="$_SCRIPT_PATH/../run_logs/${_LOG_FILE_NAME}_logcat$_LOG_FILE_EXTENSION"

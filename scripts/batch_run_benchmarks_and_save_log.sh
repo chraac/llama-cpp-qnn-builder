@@ -15,24 +15,24 @@ _quant_type='Q4_K_M'
 while [[ $# -gt 0 ]]; do
     key="$1"
     case $key in
-    --log-file-name)
+    -n | --log-file-name)
         _log_file_name="$2"
         shift
         shift
         ;;
-    --push-to-device)
+    -p | --push-to-device)
         _should_push_to_device=1
         shift
         ;;
-    --verbose)
+    -v | --verbose)
         _verbose_log=1
         shift
         ;;
-    --skip-8b)
+    -s | --skip-8b)
         _skip_8b=1
         shift
         ;;
-    --test-q4)
+    -t | --test-q4)
         _test_q4=1
         shift
         ;;
