@@ -9,10 +9,7 @@ param (
     [switch]$Verbose,
     
     [Alias('-s')]
-    [switch]$Skip8b,
-    
-    [Alias('-t')]
-    [switch]$TestQ4
+    [switch]$Skip8b
 )
 
 $_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -23,14 +20,9 @@ $_modelList = @(
     'meta-llama_Meta-Llama-3.2-3B-Instruct', 
     'meta-llama_Meta-Llama-3-8B-Instruct'
 )
-$_quantType = 'Q4_K_M'
 
 if ($PushToDevice) {
     & "$_scriptPath/push_and_run_test.ps1" -p
-}
-
-if ($TestQ4) {
-    $_quantType = 'Q4_0'
 }
 
 if ($Skip8b) {
@@ -65,7 +57,11 @@ function Run-Benchmark {
 }
 
 foreach ($model in $_modelList) {
-    $_model = "$model-${_quantType}.gguf"
+    $_model = "$model-Q4_0.gguf"
+    "Running benchmark for $_model..." | Out-File -FilePath $logFilePath -Append
+    Run-Benchmark -modelName $_model 2>&1 | Out-File -FilePath $logFilePath -Append
+
+    $_model = "$model-Q4_K_M.gguf"
     "Running benchmark for $_model..." | Out-File -FilePath $logFilePath -Append
     Run-Benchmark -modelName $_model 2>&1 | Out-File -FilePath $logFilePath -Append
 }

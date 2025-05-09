@@ -8,8 +8,6 @@ _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-
 _should_push_to_device=0
 _verbose_log=0
 _skip_8b=0
-_test_q4=0
-_quant_type='Q4_K_M'
 
 # parse arguments to get the log file name
 while [[ $# -gt 0 ]]; do
@@ -32,10 +30,6 @@ while [[ $# -gt 0 ]]; do
         _skip_8b=1
         shift
         ;;
-    -t | --test-q4)
-        _test_q4=1
-        shift
-        ;;
     *)
         echo "Invalid option $1"
         exit 1
@@ -45,10 +39,6 @@ done
 
 if [ $_should_push_to_device -eq 1 ]; then
     "$_script_path/push_and_run_test.sh" -p
-fi
-
-if [ $_test_q4 -eq 1 ]; then
-    _quant_type='Q4_0'
 fi
 
 if [ $_skip_8b -eq 1 ]; then
@@ -72,7 +62,11 @@ function run_benchmark() {
 }
 
 for model in "${_model_list[@]}"; do
-    _model="${model}-${_quant_type}.gguf"
+    _model="${model}-Q4_0.gguf"
+    echo "Running benchmark for $_model..." >>$log_file_path 2>&1
+    run_benchmark $_model >>$log_file_path 2>&1
+
+    _model="${model}-Q4_K_M.gguf"
     echo "Running benchmark for $_model..." >>$log_file_path 2>&1
     run_benchmark $_model >>$log_file_path 2>&1
 done
