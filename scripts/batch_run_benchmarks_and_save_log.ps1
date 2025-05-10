@@ -51,7 +51,7 @@ function Run-Benchmark {
     )
     
     $commandString = "cd $_devicePath && "
-    $commandString += "LLAMA_CACHE=./.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
+    $commandString += "LLAMA_CACHE=$_devicePath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
     $commandString += "./llama-bench --progress ${extraArgs} -mmp 0 -p 512 -n 128 -m ${_deviceModelPath}/$modelName"
     adb shell "$commandString"
 }
