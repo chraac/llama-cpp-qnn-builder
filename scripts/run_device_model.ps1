@@ -26,7 +26,7 @@ if ($PushToDevice) {
 }
 
 $deviceCommandString = "cd $deviceExecPath && "
-$deviceCommandString += "LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
+$deviceCommandString += "LLAMA_CACHE=./.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
 $deviceCommandString += "./llama-cli $ExtraArgs -m `"$deviceModelPath/$ModelName`" --no-mmap --color -i -r `"User:`""
 
 adb shell $deviceCommandString
