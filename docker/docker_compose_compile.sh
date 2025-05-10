@@ -20,6 +20,7 @@ _enable_hexagon_backend=0
 _hexagon_npu_only=0
 _qnn_only=0
 _disable_hexagon_and_qnn=0
+_enable_dequant=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -95,6 +96,10 @@ while (("$#")); do
         _run_backend_tests=1
         shift
         ;;
+    --enable-dequant)
+        _enable_dequant=1
+        shift
+        ;;
     *) # preserve positional arguments
         echo "Invalid option $1"
         exit 1
@@ -113,6 +118,12 @@ if [ $_hexagon_npu_only -eq 1 ]; then
     export BUILD_HEXAGON_BACKEND=1
 else
     export BUILD_HEXAGON_NPU_ONLY=0
+fi
+
+if [ $_enable_dequant -eq 1 ]; then
+    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=on"
+else
+    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=off"
 fi
 
 _build_options="${_build_options} ${_extra_build_options}"
