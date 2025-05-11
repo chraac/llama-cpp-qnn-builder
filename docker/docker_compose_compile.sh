@@ -62,14 +62,14 @@ while (("$#")); do
         shift
         ;;
     --asan)
-        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+        _extra_build_options="${_extra_build_options} -DGGML_SANITIZE_ADDRESS=on"
         shift
         ;;
     --build-linux-x64)
         _build_platform='linux'
         _build_arch='x86_64'
         # disable the qnn cpu backend, let the test use ggml cpu backend to cross verify the results
-        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+        _extra_build_options="${_extra_build_options} -DGGML_SANITIZE_ADDRESS=on"
         shift
         ;;
     --perf-log)
