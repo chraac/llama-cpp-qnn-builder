@@ -73,7 +73,7 @@ while (("$#")); do
         shift
         ;;
     --perf-log)
-        _extra_build_options="${_extra_build_options} -DGGML_QNN_ENABLE_PERFORMANCE_TRACKING=on"
+        _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_PERFORMANCE_TRACKING=on"
         shift
         ;;
     --enable-hexagon-backend)
