@@ -7,7 +7,7 @@ _log_file_name='llama-bench-batch-qnn-gpu-debug.log'
 _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-3B-Instruct' 'meta-llama_Meta-Llama-3-8B-Instruct')
 _should_push_to_device=0
 _verbose_log=0
-_skip_8b=0
+_skip_8b_model=0
 
 # parse arguments to get the log file name
 while [[ $# -gt 0 ]]; do
@@ -27,7 +27,7 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
     -s | --skip-8b)
-        _skip_8b=1
+        _skip_8b_model=1
         shift
         ;;
     *)
@@ -41,7 +41,7 @@ if [ $_should_push_to_device -eq 1 ]; then
     "$_script_path/push_and_run_test.sh" -p
 fi
 
-if [ $_skip_8b -eq 1 ]; then
+if [ $_skip_8b_model -eq 1 ]; then
     _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-3B-Instruct')
 fi
 
