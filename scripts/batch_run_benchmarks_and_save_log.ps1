@@ -57,11 +57,11 @@ function Run-Benchmark {
 }
 
 foreach ($model in $_modelList) {
-    $_model = "$model-Q4_0.gguf"
-    "Running benchmark for $_model..." | Out-File -FilePath $logFilePath -Append
-    Run-Benchmark -modelName $_model 2>&1 | Out-File -FilePath $logFilePath -Append
+    $_model_q4_0 = "$model-Q4_0.gguf"
+    "Running benchmark for $_model_q4_0..." | Out-File -FilePath $logFilePath -Append
+    Run-Benchmark -modelName $_model_q4_0 2>&1 | Out-File -FilePath $logFilePath -Append
 
-    $_model = "$model-Q4_K_M.gguf"
-    "Running benchmark for $_model..." | Out-File -FilePath $logFilePath -Append
-    Run-Benchmark -modelName $_model 2>&1 | Out-File -FilePath $logFilePath -Append
+    $_model_q4_k_m = "$model-Q4_K_M.gguf"
+    "Running benchmark for $_model_q4_k_m..." | Out-File -FilePath $logFilePath -Append
+    Run-Benchmark -modelName $_model_q4_k_m 2>&1 | Out-File -FilePath $logFilePath -Append
 }

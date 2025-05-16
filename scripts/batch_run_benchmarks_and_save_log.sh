@@ -62,11 +62,11 @@ function run_benchmark() {
 }
 
 for model in "${_model_list[@]}"; do
-    _model="${model}-Q4_0.gguf"
-    echo "Running benchmark for $_model..." >>$log_file_path 2>&1
-    run_benchmark $_model >>$log_file_path 2>&1
+    _model_q4_0="${model}-Q4_0.gguf"
+    echo "Running benchmark for $_model_q4_0..." >>$log_file_path 2>&1
+    run_benchmark $_model_q4_0 >>$log_file_path 2>&1
 
-    _model="${model}-Q4_K_M.gguf"
-    echo "Running benchmark for $_model..." >>$log_file_path 2>&1
-    run_benchmark $_model >>$log_file_path 2>&1
+    _model_q4_k_m="${model}-Q4_K_M.gguf"
+    echo "Running benchmark for $_model_q4_k_m..." >>$log_file_path 2>&1
+    run_benchmark $_model_q4_k_m >>$log_file_path 2>&1
 done
