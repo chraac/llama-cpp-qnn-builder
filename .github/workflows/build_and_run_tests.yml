@@ -59,7 +59,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Debug
-        run: docker/docker_compose_compile.sh -r -d --print-build-time --enable-hexagon-backend
+        run: docker/docker_compose_compile.sh -r -d --print-build-time --enable-hexagon-backend --enable-dequant
+      - name: Build Release
+        run: docker/docker_compose_compile.sh -r --print-build-time --hexagon-npu-only --enable-dequant
   build-windows-qnn:
     timeout-minutes: 20
     runs-on: windows-latest
