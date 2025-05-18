@@ -1,6 +1,11 @@
 param (
+    [Alias('-p')] 
     [switch]$PushToDevice,
+    
+    [Alias('-e')]
     [string]$ExtraArgs = "test",
+    
+    [Alias('-l')]
     [string]$LogFileName = "test-backend-ops_all"
 )
 
@@ -9,29 +14,10 @@ $devicePath = '/data/local/tmp'
 $logFileExtension = ".log"
 $logFilePath = "$scriptPath/../run_logs/${LogFileName}${logFileExtension}"
 $logcatOutputPath = "$scriptPath/../run_logs/${LogFileName}_logcat${logFileExtension}"
-$extraRunVars = "LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./"
+$extraRunVars = "LLAMA_CACHE=$devicePath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./"
 
-# Process non-parameter arguments for backward compatibility
-foreach ($arg in $args) {
-    switch ($arg) {
-        '-p' { $PushToDevice = $true }
-        '--push-to-device' { $PushToDevice = $true }
-        '--extra-args' { 
-            $ExtraArgs = $args[$args.IndexOf($arg) + 1]
-        }
-        '--log-file-name' { 
-            $LogFileName = $args[$args.IndexOf($arg) + 1]
-            $logFilePath = "$scriptPath/../run_logs/${LogFileName}${logFileExtension}"
-            $logcatOutputPath = "$scriptPath/../run_logs/${LogFileName}_logcat${logFileExtension}"
-        }
-        default {
-            if ($args[$args.IndexOf($arg) - 1] -notin @('--extra-args', '--log-file-name')) {
-                Write-Error "Invalid option $arg"
-                exit 1
-            }
-        }
-    }
-}
+Write-Host "ExtraArgs: $ExtraArgs"
+Write-Host "LogFilePath: $logFilePath"
 
 # Create logs directory if it doesn't exist
 $logDir = Split-Path -Parent $logFilePath

@@ -3,7 +3,7 @@
 _script_path=$(dirname "$(realpath "$0")")
 _device_exec_path='/data/local/tmp'
 _device_model_path='/sdcard'
-_model_name='meta-llama_Meta-Llama-3.2-1B-Instruct-f32.gguf'
+_model_name='meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf'
 _should_push_to_device=0
 _extra_args=''
 
@@ -36,7 +36,7 @@ if [ $_should_push_to_device -eq 1 ]; then
 fi
 
 device_command_string="cd $_device_exec_path && "
-device_command_string+="LLAMA_CACHE=./cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
+device_command_string+="LLAMA_CACHE=$_device_exec_path/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
 device_command_string+="./llama-cli $_extra_args -m '$_device_model_path/${_model_name}' --no-mmap --color -i -r 'User:'"
 
 adb shell $device_command_string
