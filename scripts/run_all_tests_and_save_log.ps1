@@ -27,7 +27,6 @@ if (!(Test-Path -Path $logDir)) {
 
 if ($PushToDevice) {
     & "$scriptPath/push_and_run_test.ps1" -p
-    adb shell "chmod +rw $devicePath/"
 }
 
 # Clear logcat
