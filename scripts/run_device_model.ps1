@@ -23,6 +23,7 @@ if ($Verbose) {
 
 if ($PushToDevice) {
     & "$scriptPath/push_and_run_test.ps1" -p
+    adb shell "chmod 777 $devicePath/"
 }
 
 $deviceCommandString = "cd $deviceExecPath && "
