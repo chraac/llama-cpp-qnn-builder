@@ -66,7 +66,57 @@ The Hexagon NPU FastRPC backend provides hardware acceleration for GGML operatio
 
 ## Benchmark Results
 
-TODO
+We conducted some performance testing to evaluate the Hexagon NPU FastRPC backend against CPU-only execution. The benchmarks focus on large matrix multiplication operations—a critical compute bottleneck in transformer-based models.
+
+### Testing Methodology
+We extended the `test-backend-ops` to include large matrix multiplication scenarios that represent typical LLM inference patterns:
+
+```patch
+diff --git forkSrcPrefix/tests/test-backend-ops.cpp forkDstPrefix/tests/test-backend-ops.cpp
+index 9ec24d9f23c5bc93b1b1e98e890e1186632358f7..584150154eee761f2d300504c525d38265fe3eb0 100644
+--- forkSrcPrefix/tests/test-backend-ops.cpp
++++ forkDstPrefix/tests/test-backend-ops.cpp
+@@ -4239,6 +4239,8 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
+             test_cases.emplace_back(new test_mul_mat(type_a, type_b, 16,  1, 1024, {3, 2}, {1, 1}));
+             test_cases.emplace_back(new test_mul_mat(type_a, type_b, 16,  8, 1024, {3, 2}, {1, 1}));
+             test_cases.emplace_back(new test_mul_mat(type_a, type_b, 16, 16, 1024, {3, 2}, {1, 1}));
++            test_cases.emplace_back(new test_mul_mat(type_a, type_b, 8192, 1, 8192, {1, 1}, {1, 1}));
++            test_cases.emplace_back(new test_mul_mat(type_a, type_b, 16384, 1, 16384, {1, 1}, {1, 1}));
+         }
+     }
+     for (ggml_type type_a : other_types) {
+```
+
+### Performance Results
+
+The following table compares execution time (lower is better) across different precision formats for a large 16384×16384 matrix multiplied by a 16384×1 vector on some devices:
+
+| devices | commit    | type | src0_dim    | src1_dim | cpu_time(us) | host_total(us) | host_param_update(us) | device_total(us) | device_dequant(us) | device_compute(us) |
+| ------- | --------- | ---- | ----------- | -------- | ------------ | -------------- | --------------------- | ---------------- | ------------------ | ------------------ |
+| 8gen2   | 8409dd1e9 | F32  | 16384x16384 | 16384x1  | 38935        | 285529         | 296                   | 89518            | 0                  | 89518              |
+| 8gen2   | 8409dd1e9 | Q8_0 | 16384x16384 | 16384x1  | 8930         | 327385         | 774                   | 255894           | 245178             | 10716              |
+| 8gen2   | 8409dd1e9 | Q4_0 | 16384x16384 | 16384x1  | 12503        | 143390         | 735                   | 96932            | 86927              | 10005              |
+
+### Key Observations
+
+The benchmark results reveal several important insights about the Hexagon NPU FastRPC implementation:
+
+- **Dequantization Bottleneck**:
+  - For quantized formats, 90-96% of NPU time is spent on dequantization, making this our primary optimization target
+
+- **Compute Efficiency**:
+  - When data resides in VTCM memory, the NPU shows excellent computational performance (~10,000 μs) for matrix multiplication operations
+  - This represents a ~4× improvement over CPU FP32 performance when comparing pure computation time
+  - However, the overall NPU performance is currently limited by memory transfers and dequantization overhead
+
+- **Memory Access Patterns**:
+  - Pure F32 computation on NPU (~90,000 μs) is slower than CPU (~39,000 μs) due to memory access patterns
+  - The significant performance difference between F32 and post-dequantization Q4_0/Q8_0 execution suggests optimization potential through better VTCM utilization
+
+- **Communication Overhead**:
+  - The host_param_update time (700-800 μs) represents FastRPC communication overhead
+  - While minimal for large operations, this overhead becomes proportionally significant for smaller tensor operations
+  - Batching operations into larger computation graphs would help amortize these costs
 
 ## Future Developments
 
@@ -74,4 +124,3 @@ TODO
 - **Dynamic Thread Scheduling**: Runtime load balancing and work-stealing across the 4 hardware threads
 - **Performance Profiling Suite**: Custom profiling tools for FastRPC execution paths and bottleneck analysis
 - **Advanced Graph Fusion**: Sophisticated operation fusion techniques to minimize memory transfers and maximize NPU utilization
-- **Model-Specific Optimizations**: Tailored kernel implementations for popular model architectures (Llama, Mistral, etc.)
