@@ -1,4 +1,4 @@
-# Hexagon NPU FastRPC Backend for GGML
+# Hexagon NPU FastRPC Backend Overview
 
 ## Overview
 
@@ -48,21 +48,21 @@ The Hexagon NPU FastRPC backend provides hardware acceleration for GGML operatio
 ### Based on FastRPC Framework
 
 #### Host Side (`ggml/src/ggml-qnn/npu/host/`)
-- **Host Device Management**: [`host_device.cpp`](ggml/src/ggml-qnn/npu/host/host_device.cpp) - NPU device interface and lifecycle management
-- **Host Graph Coordination**: [`host_graph.cpp`](ggml/src/ggml-qnn/npu/host/host_graph.cpp) - graph creation, caching, and execution coordination
-- **Buffer Management**: [`buffer.cpp`](ggml/src/ggml-qnn/npu/host/buffer.cpp) - RPC memory buffers, ION allocation, and zero-copy data transfer
+- **Host Device Management**: [`host_device.cpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/host/host_device.cpp) - NPU device interface and lifecycle management
+- **Host Graph Coordination**: [`graph.cpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/host/graph.cpp) - graph creation, caching, and execution coordination
+- **Buffer Management**: [`buffer.cpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/host/buffer.cpp) - RPC memory buffers, ION allocation, and zero-copy data transfer
 - **Type Conversion Utilities**: Efficient host-device data format conversion and RPC interface helpers
 
 #### Device Side (`ggml/src/ggml-qnn/npu/device/`)
-- **Device Runtime**: [`device.cpp`](ggml/src/ggml-qnn/npu/device/device.cpp) - core NPU-side runtime executing on Hexagon hardware
-- **Graph Execution Engine**: [`graph.cpp`](ggml/src/ggml-qnn/npu/device/graph.cpp) - NPU-side graph computation with 4-thread parallelization
-- **HVX Operation Kernels**: [`op_impl.cpp`](ggml/src/ggml-qnn/npu/device/op_impl.cpp) - hand-optimized HVX intrinsic implementations
-- **Quantization Kernels**: [`quants.cpp`](ggml/src/ggml-qnn/npu/device/quants.cpp) - HVX-optimized dequantization for Q4_0, Q8_0, Q4_K
-- **Thread Management**: [`thread_pool.hpp`](ggml/src/ggml-qnn/npu/device/thread_pool.hpp) - custom 4-thread pool using QURT primitives
-- **Memory Management**: [`vtcm_mem.hpp`](ggml/src/ggml-qnn/npu/device/vtcm_mem.hpp) - VTCM allocation with RAII semantics
+- **Device Runtime**: [`device.cpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/device/device.cpp) - core NPU-side runtime executing on Hexagon hardware
+- **Graph Execution Engine**: [`graph.cpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/device/graph.cpp) - NPU-side graph computation with 4-thread parallelization
+- **HVX Operation Kernels**: [`op_impl.cpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/device/op_impl.cpp) - hand-optimized HVX intrinsic implementations
+- **Quantization Kernels**: [`quants.cpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/device/quants.cpp) - HVX-optimized dequantization for Q4_0, Q8_0, Q4_K
+- **Thread Management**: [`thread_pool.hpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/device/thread_pool.hpp) - custom 4-thread pool using QURT primitives
+- **Memory Management**: [`vtcm_mem.hpp`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/device/vtcm_mem.hpp) - VTCM allocation with RAII semantics
 
 #### FastRPC Interface (`ggml/src/ggml-qnn/npu/idl/`)
-- **Interface Definition**: [`hexagon_npu.idl`](ggml/src/ggml-qnn/npu/idl/hexagon_npu.idl) - defines the RPC contract between host CPU and Hexagon NPU
+- **Interface Definition**: [`hexagon_npu.idl`](https://github.com/chraac/llama.cpp/blob/dev-refactoring/ggml/src/ggml-qnn/npu/idl/hexagon_npu.idl) - defines the RPC contract between host CPU and Hexagon NPU
 
 ## Benchmark Results
 
