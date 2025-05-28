@@ -72,10 +72,10 @@ We conducted some performance testing to evaluate the Hexagon NPU FastRPC backen
 We extended the `test-backend-ops` to include large matrix multiplication scenarios that represent typical LLM inference patterns:
 
 ```patch
-diff --git forkSrcPrefix/tests/test-backend-ops.cpp forkDstPrefix/tests/test-backend-ops.cpp
+diff --git tests/test-backend-ops.cpp tests/test-backend-ops.cpp
 index 9ec24d9f23c5bc93b1b1e98e890e1186632358f7..584150154eee761f2d300504c525d38265fe3eb0 100644
---- forkSrcPrefix/tests/test-backend-ops.cpp
-+++ forkDstPrefix/tests/test-backend-ops.cpp
+--- tests/test-backend-ops.cpp
++++ tests/test-backend-ops.cpp
 @@ -4239,6 +4239,8 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
              test_cases.emplace_back(new test_mul_mat(type_a, type_b, 16,  1, 1024, {3, 2}, {1, 1}));
              test_cases.emplace_back(new test_mul_mat(type_a, type_b, 16,  8, 1024, {3, 2}, {1, 1}));
