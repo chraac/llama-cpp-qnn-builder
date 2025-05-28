@@ -6,9 +6,46 @@ This guide describes the steps to build a Android/Windows release of the QNN bac
 
 1. Install latest docker engine follow the official steps: [Install Docker Engine](https://docs.docker.com/engine/install/)
 1. Clone my [llama-cpp-qnn-builder](https://github.com/chraac/llama-cpp-qnn-builder) repo (please update to latest `main` since we're using NDK r23, and there're some optimization flag not correctly applied in `Release` build, see: https://github.com/android/ndk/issues/1740)
-1. In builder folder, run `docker\docker_compose_compile_and_share.sh` 
+1. In builder folder, run `docker\docker_compose_compile_and_share.sh`
 1. Console output will look like this one, and exectualbe is located at `build_qnn_arm64-v8a\bin\`
   ![image](https://github.com/user-attachments/assets/101a97be-efdf-455d-9d3c-a593311e144a)
+
+### Build Script Parameters
+
+| Parameter                   | Short | Description                                | Default             |
+| --------------------------- | ----- | ------------------------------------------ | ------------------- |
+| `--rebuild`                 | `-r`  | Force rebuild of the project               | `false`             |
+| `--repo-dir`                |       | Specify llama.cpp repository directory     | `../llama.cpp`      |
+| `--debug`                   | `-d`  | Build in Debug mode                        | `Release`           |
+| `--print-build-time`        |       | Display build and test execution times     | `false`             |
+| `--asan`                    |       | Enable AddressSanitizer                    | `false`             |
+| `--build-linux-x64`         |       | Build for Linux x86_64 platform            | `android arm64-v8a` |
+| `--perf-log`                |       | Enable Hexagon performance tracking        | `false`             |
+| `--enable-hexagon-backend`  |       | Enable Hexagon backend support             | `false`             |
+| `--hexagon-npu-only`        |       | Build Hexagon NPU backend only             | `false`             |
+| `--disable-hexagon-and-qnn` |       | Disable both Hexagon and QNN backends      | `false`             |
+| `--qnn-only`                |       | Build QNN backend only                     | `false`             |
+| `--enable-dequant`          |       | Enable quantized tensor support in Hexagon | `false`             |
+
+### Examples
+
+```bash
+# Basic build
+./docker_compose_compile_and_share.sh
+
+# Debug build with hexagon-npu backend
+./docker_compose_compile_and_share.sh -d --enable-hexagon-backend
+
+# Debug build with hexagon-npu backend only
+./docker_compose_compile_and_share.sh -d --hexagon-npu-only
+
+# Debug build with hexagon-npu backend only and npu quantized tensor support
+./docker_compose_compile_and_share.sh -d --hexagon-npu-only --enable-dequant
+
+# QNN-only build with performance logging
+./docker_compose_compile_and_share.sh --qnn-only --perf-log
+
+```
 
 ## Windows
 
