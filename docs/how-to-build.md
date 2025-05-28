@@ -1,5 +1,3 @@
-# How to Build
-
 This guide describes the steps to build Android/Windows releases of the QNN backend for llama.cpp.
 
 ## Android
@@ -75,8 +73,11 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 2. **Install Visual Studio 2022**
    - Ensure the following components are installed:
      - **Clang toolchain** for ARM64 compilation
+
         ![VS2022 Clang Installation](https://github.com/user-attachments/assets/30ee11f7-9069-4793-856d-c64bcd5d563b)
+
      - **CMake tools** for Visual Studio
+
         ![VS2022 CMake Installation](https://github.com/user-attachments/assets/9a36dde5-0e41-4421-9161-e9b09cd32eb1)
 
 ### Build Steps
