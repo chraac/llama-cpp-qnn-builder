@@ -9,7 +9,10 @@ param (
     [switch]$PushToDevice,
 
     [Alias('-e')]
-    [string]$ExtraArgs = ''  # Add extraArgs parameter with default empty string
+    [string]$ExtraArgs = '', # Add extraArgs parameter with default empty string
+
+    [Alias('-f')]
+    [switch]$FlashAttention
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -23,6 +26,10 @@ if ($Verbose) {
 
 if ($PushToDevice) {
     & "$scriptPath/push_and_run_test.ps1" -p
+}
+
+if ($FlashAttention) {
+    $ExtraArgs += " --flash-attn"
 }
 
 $deviceCommandString = "cd $deviceExecPath && "
