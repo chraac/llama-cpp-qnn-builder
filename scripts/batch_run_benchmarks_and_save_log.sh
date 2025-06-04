@@ -8,6 +8,7 @@ _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-
 _should_push_to_device=0
 _verbose_log=0
 _skip_8b_model=0
+_flash_attn=0
 
 # parse arguments to get the log file name
 while [[ $# -gt 0 ]]; do
@@ -30,6 +31,10 @@ while [[ $# -gt 0 ]]; do
         _skip_8b_model=1
         shift
         ;;
+    -f | --flash-attn)
+        _flash_attn=1
+        shift
+        ;;
     *)
         echo "Invalid option $1"
         exit 1
@@ -45,9 +50,13 @@ if [ $_skip_8b_model -eq 1 ]; then
     _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-3B-Instruct')
 fi
 
-extra_args=""
+_extra_args=""
 if [ $_verbose_log -eq 1 ]; then
-    extra_args="-v"
+    _extra_args="-v"
+fi
+
+if [ $_flash_attn -eq 1 ]; then
+    _extra_args="${_extra_args} --flash-attn"
 fi
 
 log_file_path="$_script_path/../run_logs/$_log_file_name"
@@ -57,7 +66,7 @@ function run_benchmark() {
     local model_name=$1
     local command_string="cd $_device_path && "
     command_string+="LLAMA_CACHE=$_device_path/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-    command_string+="./llama-bench --progress ${extra_args} -mmp 0 -p 512 -n 128 -m ${_device_model_path}/$model_name"
+    command_string+="./llama-bench --progress ${_extra_args} -mmp 0 -p 512 -n 128 -m ${_device_model_path}/$model_name"
     adb shell $command_string
 }
 

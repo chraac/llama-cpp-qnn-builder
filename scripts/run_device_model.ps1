@@ -8,20 +8,18 @@ param (
     [Alias('-p')]
     [switch]$PushToDevice,
 
-    [Alias('-e')]
-    [string]$ExtraArgs = '', # Add extraArgs parameter with default empty string
-
     [Alias('-f')]
-    [switch]$FlashAttention
+    [switch]$FlashAttention = 0
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $deviceExecPath = '/data/local/tmp'
 $deviceModelPath = '/sdcard'
 
-# Set ExtraArgs based on Verbose if not explicitly provided
+$extraArgs = ""
+# Set extraArgs based on Verbose if not explicitly provided
 if ($Verbose) {
-    $ExtraArgs = "-v"
+    $extraArgs = "-v"
 }
 
 if ($PushToDevice) {
@@ -29,11 +27,11 @@ if ($PushToDevice) {
 }
 
 if ($FlashAttention) {
-    $ExtraArgs += " --flash-attn"
+    $extraArgs += " --flash-attn"
 }
 
 $deviceCommandString = "cd $deviceExecPath && "
 $deviceCommandString += "LLAMA_CACHE=$deviceExecPath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-$deviceCommandString += "./llama-cli $ExtraArgs -m `"$deviceModelPath/$ModelName`" --no-mmap --color -i -r `"User:`""
+$deviceCommandString += "./llama-cli $extraArgs -m `"$deviceModelPath/$ModelName`" --no-mmap --color -i -r `"User:`""
 
 adb shell $deviceCommandString

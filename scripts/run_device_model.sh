@@ -5,7 +5,7 @@ _device_exec_path='/data/local/tmp'
 _device_model_path='/sdcard'
 _model_name='meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf'
 _should_push_to_device=0
-_flash_attn=1
+_flash_attn=0
 _extra_args=''
 
 # parse arguments to get the log file name

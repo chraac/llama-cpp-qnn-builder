@@ -9,7 +9,10 @@ param (
     [switch]$Verbose,
     
     [Alias('-s')]
-    [switch]$Skip8b
+    [switch]$Skip8b,
+
+    [Alias('-f')]
+    [switch]$FlashAttention = 0
 )
 
 $_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -35,6 +38,10 @@ if ($Skip8b) {
 $extraArgs = ""
 if ($Verbose) {
     $extraArgs = "-v"
+}
+
+if ($FlashAttention) {
+    $extraArgs += " --flash-attn"
 }
 
 $logFilePath = "$_scriptPath/../run_logs/$LogFileName"
