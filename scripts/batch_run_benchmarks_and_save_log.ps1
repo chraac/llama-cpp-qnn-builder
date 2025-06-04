@@ -12,7 +12,7 @@ param (
     [switch]$Skip8b,
 
     [Alias('-f')]
-    [switch]$FlashAttention = 0
+    [switch]$FlashAttention
 )
 
 $_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path

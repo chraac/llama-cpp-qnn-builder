@@ -9,7 +9,7 @@ param (
     [switch]$PushToDevice,
 
     [Alias('-f')]
-    [switch]$FlashAttention = 0
+    [switch]$FlashAttention
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
