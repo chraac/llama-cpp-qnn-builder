@@ -41,7 +41,7 @@ if ($Verbose) {
 }
 
 if ($FlashAttention) {
-    $extraArgs += " --flash-attn"
+    $extraArgs += " --flash-attn 1"
 }
 
 $logFilePath = "$_scriptPath/../run_logs/$LogFileName"
