@@ -80,6 +80,15 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 
         ![VS2022 CMake Installation](https://github.com/user-attachments/assets/9a36dde5-0e41-4421-9161-e9b09cd32eb1)
 
+3. **Install Hexagon SDK (for Hexagon NPU backend)**
+   - To compile the `hexagon-npu` backend, you need to install the latest Hexagon SDK
+   - Follow the [official documentation](https://docs.qualcomm.com/bundle/publicresource/topics/80-77512-1/hexagon-dsp-sdk-getting-started.html?product=1601111740010422):
+     1. First install the Qualcomm Package Manager (QPM)
+     2. Then use QPM to install the Hexagon SDK
+   - Set the environment variable `HEXAGON_SDK_ROOT` to point to your installation directory
+
+   > **Note**: The Hexagon SDK is only required if you plan to build with `--enable-hexagon-backend` or `--hexagon-npu-only` flags.
+
 ### Build Steps
 
 1. **Open the Project**
@@ -124,4 +133,4 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 After successful compilation, you'll find the following executables:
 - `llama-cli.exe` - Main inference executable
 - `llama-bench.exe` - Benchmarking tool
-- `test-backend-ops.exe` - Backend operation tests
+- `test-backend-ops.exe` - Backend operation tests 
