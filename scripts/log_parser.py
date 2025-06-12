@@ -19,9 +19,10 @@ OP_TIME_CONSUME_LINE = re.compile(
 # FLASH_ATTN_EXT(hsk=192,hsv=128,nh=4,nr=4,kv=512,nb=35,mask=1,max_bias=0.000000,logit_softcap=0.000000,prec=f32,type_KV=f16,permute=[0,1,2,3]): [1;32mOK[0m
 OP_SECTION_END = re.compile(r' +([A-Z_]+)\(([^(]+)\): \[1;32mOK\[0m')
 
-OP_PROP_ITEM = re.compile(r'([a-z_]+)=(([a-zA-Z0-9_]+)|(\[[0-9,]+]))[ ,]*')
+OP_PROP_ITEM = re.compile(r'([a-zA-Z_]+)=(([a-zA-Z0-9_]+)|(\[[0-9,]+]))[ ,]*')
+OP_TYPE_PROPS = re.compile(r'type[_a-zA-Z]*|prec')
 OP_FLOAT_PROPS = re.compile(r'max_bias|logit_softcap')
-OP_BOOL_PROPS = re.compile(r'prec')
+OP_BOOL_PROPS = re.compile(r'mask')
 OP_ARRAY_PROPS = re.compile(r'ne|nr|bs|per|permute|[mnkv]|hsk|hsv|nh|kv|nb')
 OP_ARRAY_PROP_ITEMS = re.compile(r'\[([0-9]+,?)+]')
 
@@ -71,7 +72,7 @@ class OpItem:
         for match in OP_PROP_ITEM.finditer(prop):
             key = match.group(1)
             value = match.group(2)
-            if key.startswith('type'):
+            if OP_TYPE_PROPS.match(key):
                 ret[key] = OpTensor.DataType(value)
             elif OP_FLOAT_PROPS.match(key):
                 ret[key] = float(value)
