@@ -1,11 +1,12 @@
 import argparse
 import enum
 import re
+from typing import Iterator
 
 # [profiler][hexagon-npu][0xb400007b714311d8]update, handle(0xe8aa20), dur: 279 us
 # [profiler][hexagon-npu][0xb400007b714311d8]compute, handle(0xe8aa20), dur: 328 us
 OP_BREAKDOWN_LINE = re.compile(
-    r'\[profiler]\[hexagon-npu]\[0x[a-f0-9]+](update|compute), handle\([0x[a-f0-9]+]\), dur: (\d+) us'
+    r'\[profiler]\[hexagon-npu]\[0x[a-f0-9]+](update|compute), handle\(0x[a-f0-9]+\), dur: (\d+) us'
 )
 
 # [profiler][MUL_MAT]compute, [hexagon-npu]: 976 us, [CPU]: 99 us
@@ -36,7 +37,8 @@ class OpData:
         self.compute_us = compute_us
 
     def __repr__(self) -> str:
-        return f'OpData(name={self.name}, total_us={self.total_us}, update_us={self.update_us}, compute_us={self.compute_us})'
+        return (f'OpData(name={self.name}, total_us={self.total_us}, update_us={self.update_us},'
+                f' compute_us={self.compute_us})')
 
 
 class OpTensor:
@@ -59,12 +61,38 @@ class OpTensor:
 
 class OpItem:
     def __init__(self, name: str, prop: str, data: OpData):
-        self.name = name
-        self.data = data
-        self.props = OpItem.__parse_prop(prop)
+        self.name: str = name
+        self.data: OpData = data
+        self.props: list = OpItem.__parse_prop(prop)
 
     def __repr__(self) -> str:
         return f'OpItem(name={self.name}, data={self.data})'
+
+    @staticmethod
+    def list_from_iterable(lines: Iterator) -> list:
+        lst: list[OpItem] = []
+        update_us: int = 0
+        compute_us: int = 0
+        dic: dict[str:OpData] = {}
+        for line in lines:
+            if match := OP_BREAKDOWN_LINE.match(line):
+                item_type = match.group(1)
+                if item_type == 'update':
+                    update_us = int(match.group(2))
+                elif item_type == 'compute':
+                    compute_us = int(match.group(2))
+            elif match := OP_TIME_CONSUME_LINE.match(line):
+                op_name = match.group(1)
+                if op_name is not 'NONE':
+                    dic[op_name] = OpData(op_name, int(match.group(2)), int(match.group(3)), update_us, compute_us)
+            elif match := OP_SECTION_END.match(line):
+                op_name = match.group(1)
+                if dic[op_name]:
+                    data = dic[op_name]
+                    lst.append(OpItem(name=op_name, prop=match.group(2), data=data))
+            else:
+                continue
+        return lst
 
     @staticmethod
     def __parse_prop(prop: str) -> dict[str:(OpTensor.DataType | int | float | bool | list)]:
@@ -97,27 +125,7 @@ class LogParser:
     def parse(self):
         lst: list[OpItem] = []
         with open(self.filename, 'r') as file:
-            update_us: int = 0
-            compute_us: int = 0
-            dic: dict[str:OpData] = {}
-            for line in file:
-                if match := OP_BREAKDOWN_LINE.match(line):
-                    item_type = match.group(1)
-                    if item_type == 'update':
-                        update_us = int(match.group(2))
-                    elif item_type == 'compute':
-                        compute_us = int(match.group(2))
-                elif match := OP_TIME_CONSUME_LINE.match(line):
-                    op_name = match.group(1)
-                    if op_name is not 'NONE':
-                        dic[op_name] = OpData(op_name, int(match.group(2)), int(match.group(3)), update_us, compute_us)
-                elif match := OP_SECTION_END.match(line):
-                    op_name = match.group(1)
-                    if dic[op_name]:
-                        data = dic[op_name]
-                        lst.append(OpItem(name=op_name, prop=match.group(2), data=data))
-                else:
-                    continue
+            lst = OpItem.list_from_iterable(file)
 
 
 if __name__ == "__main__":
