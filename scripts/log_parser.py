@@ -230,9 +230,12 @@ class LogParser:
 
     def parse_and_save(self, output_file: str):
         ops: list[OpItem] = []
+        print(f'Parsing log file: {self._input_file} with encoding: {self._encoding}')
         with open(self._input_file, 'r', encoding=self._encoding) as file:
             ops = items_from_iterable(file)
+        print('Successfully parsed log file, now saving to CSV...')
         LogParser.__save_csv(ops, output_file)
+        print(f'Successfully saved {len(ops)} operations to {output_file}.')
 
     @staticmethod
     def __save_csv(ops: list[OpItem], output_file: str):
