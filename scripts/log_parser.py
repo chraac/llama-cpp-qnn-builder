@@ -1,5 +1,7 @@
 import argparse
+import csv
 import enum
+import os
 import re
 from typing import Iterator
 
@@ -60,13 +62,42 @@ class OpTensor:
 
 
 class OpItem:
+    class Fields(enum.Enum):
+        NAME = 'name'
+        DIMS = 'dims'
+        TYPE = 'type'
+        CPU_TOTAL_US = 'cpu_total_us'
+        TOTAL_US = 'total_us'
+        UPDATE_US = 'update_us'
+        COMPUTE_US = 'compute_us'
+
     def __init__(self, name: str, prop: str, data: OpData):
         self.name: str = name
         self.data: OpData = data
         self.props: list = OpItem.__parse_prop(prop)
+        self._output_tensor = None
 
     def __repr__(self) -> str:
         return f'OpItem(name={self.name}, data={self.data})'
+
+    def get_output_tensor(self) -> OpTensor:
+        return self._output_tensor
+
+    def to_list_props(self) -> dict[Fields: str]:
+        ret: dict[OpItem.Fields: str] = {
+            OpItem.Fields.NAME: self.name,
+            OpItem.Fields.DIMS: OpItem.__dims_to_str(self.get_output_tensor().shape),
+            OpItem.Fields.TYPE: str(self.get_output_tensor().dtype.value),
+            OpItem.Fields.CPU_TOTAL_US: str(self.data.cpu_total_us),
+            OpItem.Fields.TOTAL_US: str(self.data.total_us),
+            OpItem.Fields.UPDATE_US: str(self.data.update_us),
+            OpItem.Fields.COMPUTE_US: str(self.data.compute_us),
+        }
+        return self._to_list_props(ret)
+
+    # noinspection PyMethodMayBeStatic
+    def _to_list_props(self, dic: dict[Fields: str]) -> dict[Fields: str]:
+        return dic
 
     @staticmethod
     def list_from_iterable(lines: Iterator) -> list:
@@ -113,23 +144,92 @@ class OpItem:
                 else:
                     ret[key] = int(value)
             else:
-                print(f'Unknown property key: {key} with value: {value}')
                 continue
         return ret
 
+    @staticmethod
+    def __dims_to_str(dims: list[int]) -> str:
+        return 'x'.join(map(str, dims))
+
+
+class OpUnary(OpItem):
+    def __init__(self, name: str, prop: str, data: OpData):
+        super().__init__(name, prop, data)
+        self._output_tensor = OpTensor(
+            dtype=self.props['type'],
+            shape=self.props['ne'],
+            permute=self.props['permute'],
+        )
+
+    def __repr__(self) -> str:
+        return f'OpUnary(name={self.name}, tensor={self.tensor}, data={self.data})'
+
+
+class OpBinary(OpItem):
+    def __init__(self, name: str, prop: str, data: OpData):
+        super().__init__(name, prop, data)
+        self._output_tensor = OpTensor(
+            dtype=self.props['type'],
+            shape=self.props['ne'],
+            permute=None,
+        )
+
+    def __repr__(self) -> str:
+        return f'OpUnary(name={self.name}, tensor={self.tensor}, data={self.data})'
+
+
+class OpMulMat(OpItem):
+    def __init__(self, name: str, prop: str, data: OpData):
+        super().__init__(name, prop, data)
+        self._output_tensor = OpTensor(
+            dtype=self.props['type_b'],
+            shape=[self.props['k'], self.props['m'], self.props['n'], 1],
+            permute=self.props['per'],
+        )
+
+    def __repr__(self) -> str:
+        return f'OpMulMat(name={self.name}, tensor={self.tensor}, data={self.data})'
+
+
+class OpFlashAttnExt(OpItem):
+    def __init__(self, name: str, prop: str, data: OpData):
+        super().__init__(name, prop, data)
+        self._output_tensor = OpTensor(
+            dtype=self.props['type_KV'],
+            shape=[self.props['hsk'], self.props['nh'] * self.props['nr'], self.props['nb'], 1],
+            permute=self.props['permute'],
+        )
+
+    def __repr__(self) -> str:
+        return f'OpFlashAttnExt(name={self.name}, tensor={self.tensor}, data={self.data})'
+
 
 class LogParser:
-    def __init__(self, filename: str):
-        self.filename = filename
 
-    def parse(self):
-        lst: list[OpItem] = []
-        with open(self.filename, 'r') as file:
-            lst = OpItem.list_from_iterable(file)
+    def __init__(self, input_file: str):
+        self._input_file = input_file
+
+    def parse_and_save(self, output_file: str):
+        ops: list[OpItem] = []
+        with open(self._input_file, 'r') as file:
+            ops = OpItem.list_from_iterable(file)
+        LogParser.__save_csv(ops, output_file)
+
+    @staticmethod
+    def __save_csv(ops: list[OpItem], output_file: str):
+        with open(output_file, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile, delimiter=' ',
+                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow([e.value for e in OpItem.Fields])
+            for item in ops:
+                props = item.to_list_props()
+                writer.writerow([props[e] for e in OpItem.Fields])
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--filename', type=str, help='Specify the log file to parse')
     args = parser.parse_args()
-    parser = LogParser(args.filename)
+    output_name = f'{os.path.splitext(args.filename)[0]}.csv'
+    print(f'Output file name: {output_name}')
+    LogParser(args.filename).parse_and_save(output_name)
