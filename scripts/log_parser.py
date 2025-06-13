@@ -23,7 +23,7 @@ OP_TIME_CONSUME_LINE = re.compile(
 OP_SECTION_END = re.compile(r' +([A-Z_]+)\(([^(]+)\): \[1;32mOK\[0m')
 
 OP_PROP_ITEM = re.compile(r'([a-zA-Z_]+)=(([a-zA-Z0-9_]+)|(\[[0-9,]+]))[ ,]*')
-OP_TYPE_PROPS = re.compile(r'type[_a-zA-Z]*|prec')
+OP_TYPE_PROPS = re.compile(r'type[_a-zA-Z]*')
 OP_FLOAT_PROPS = re.compile(r'max_bias|logit_softcap')
 OP_BOOL_PROPS = re.compile(r'mask')
 OP_ARRAY_PROPS = re.compile(r'ne|nr|bs|per|permute|[mnkv]|hsk|hsv|nh|kv|nb')
@@ -45,6 +45,7 @@ class OpData:
 
 class OpTensor:
     class DataType(enum.Enum):
+        NONE = 'none'
         F16 = 'f16'
         F32 = 'f32'
         Q4_K = 'q4_K'
@@ -74,6 +75,7 @@ class OpItem:
     def __init__(self, name: str, prop: str, data: OpData):
         self.name: str = name
         self.data: OpData = data
+        self.raw_prop: str = prop
         self.props: list = OpItem.__parse_prop(prop)
         self._output_tensor = None
 
@@ -114,7 +116,7 @@ class OpItem:
                     compute_us = int(match.group(2))
             elif match := OP_TIME_CONSUME_LINE.match(line):
                 op_name = match.group(1)
-                if op_name is not 'NONE':
+                if op_name != 'NONE':
                     dic[op_name] = OpData(op_name, int(match.group(2)), int(match.group(3)), update_us, compute_us)
             elif match := OP_SECTION_END.match(line):
                 op_name = match.group(1)
@@ -131,7 +133,9 @@ class OpItem:
         for match in OP_PROP_ITEM.finditer(prop):
             key = match.group(1)
             value = match.group(2)
-            if OP_TYPE_PROPS.match(key):
+            if key == 'prec':
+                ret[key] = OpTensor.DataType.NONE if value == 'def' else OpTensor.DataType(value)
+            elif OP_TYPE_PROPS.match(key):
                 ret[key] = OpTensor.DataType(value)
             elif OP_FLOAT_PROPS.match(key):
                 ret[key] = float(value)
@@ -158,7 +162,7 @@ class OpUnary(OpItem):
         self._output_tensor = OpTensor(
             dtype=self.props['type'],
             shape=self.props['ne'],
-            permute=self.props['permute'],
+            permute=None,
         )
 
     def __repr__(self) -> str:
@@ -204,26 +208,63 @@ class OpFlashAttnExt(OpItem):
         return f'OpFlashAttnExt(name={self.name}, tensor={self.tensor}, data={self.data})'
 
 
+def items_from_iterable(lines: Iterator) -> list[OpItem]:
+    def map_item_subtype(item: OpItem) -> OpItem:
+        if item.name == 'MUL_MAT':
+            return OpMulMat(name=item.name, prop=item.raw_prop, data=item.data)
+        elif item.name == 'FLASH_ATTN_EXT':
+            return OpFlashAttnExt(name=item.name, prop=item.raw_prop, data=item.data)
+        elif item.name == 'RMS_NORM':
+            return OpUnary(name=item.name, prop=item.raw_prop, data=item.data)
+        return OpBinary(name=item.name, prop=item.raw_prop, data=item.data)
+
+    lst: list[OpItem] = OpItem.list_from_iterable(lines)
+    return [map_item_subtype(it) for it in lst]
+
+
 class LogParser:
 
-    def __init__(self, input_file: str):
+    def __init__(self, input_file: str, encoding: str | None):
         self._input_file = input_file
+        self._encoding = encoding
 
     def parse_and_save(self, output_file: str):
         ops: list[OpItem] = []
-        with open(self._input_file, 'r') as file:
-            ops = OpItem.list_from_iterable(file)
+        with open(self._input_file, 'r', encoding=self._encoding) as file:
+            ops = items_from_iterable(file)
         LogParser.__save_csv(ops, output_file)
 
     @staticmethod
     def __save_csv(ops: list[OpItem], output_file: str):
         with open(output_file, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile, delimiter=' ',
-                                quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            writer = csv.writer(csvfile)
             writer.writerow([e.value for e in OpItem.Fields])
             for item in ops:
                 props = item.to_list_props()
                 writer.writerow([props[e] for e in OpItem.Fields])
+
+
+def get_file_encoding(file_name: str) -> str | None:
+    """
+    Detect the encoding of a file.
+    :param file_name: The name of the file to check.
+    :return: The detected encoding, or 'utf-8' if detection fails.
+    """
+    enc_list = [
+        'utf_16_beUTF-16BEall',
+        'utf_16_le',
+        'utf_8',
+        'unicode_escape',
+        'unicode_internal',
+    ]
+    for encode in enc_list:
+        try:
+            with open(file_name, encoding=encode) as f:
+                f.read()
+            return encode  # Default to utf-8 if no BOM is found
+        except Exception as e:
+            print(f"Error reading file {file_name}: {e}")
+    return None
 
 
 if __name__ == "__main__":
@@ -232,4 +273,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     output_name = f'{os.path.splitext(args.filename)[0]}.csv'
     print(f'Output file name: {output_name}')
-    LogParser(args.filename).parse_and_save(output_name)
+    LogParser(args.filename, get_file_encoding(args.filename)).parse_and_save(output_name)
