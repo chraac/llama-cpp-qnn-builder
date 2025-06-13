@@ -65,8 +65,8 @@ class OpTensor:
 class OpItem:
     class Fields(enum.Enum):
         NAME = 'name'
-        DIMS = 'dims'
         TYPE = 'type'
+        DIMS = 'dims'
         CPU_TOTAL_US = 'cpu_total_us'
         TOTAL_US = 'total_us'
         UPDATE_US = 'update_us'
