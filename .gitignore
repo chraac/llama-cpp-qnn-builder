@@ -6,3 +6,4 @@ build_qnn_*
 temp/*
 *.txt
 run_logs
+*.pyc
