@@ -179,7 +179,7 @@ class OpBinary(OpItem):
         )
 
     def __repr__(self) -> str:
-        return f'OpUnary(name={self.name}, tensor={self.tensor}, data={self.data})'
+        return f'OpBinary(name={self.name}, tensor={self._output_tensor}, data={self.data})'
 
 
 class OpMulMat(OpItem):
