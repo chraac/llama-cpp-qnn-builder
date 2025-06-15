@@ -76,7 +76,7 @@ class OpItem:
         self.name: str = name
         self.data: OpData = data
         self.raw_prop: str = prop
-        self.props: list = OpItem.__parse_prop(prop)
+        self.props: dict = OpItem.__parse_prop(prop)
         self._output_tensor = None
 
     def __repr__(self) -> str:
