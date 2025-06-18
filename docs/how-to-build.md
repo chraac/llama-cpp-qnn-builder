@@ -17,7 +17,7 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 
 1. Navigate to the project root directory and run the build script:
    ```bash
-   ./docker/docker_compose_compile_and_share.sh
+   ./docker/docker_compose_compile.sh
    ```
 
 2. The console output will look similar to this, and executables will be located in `build_qnn_arm64-v8a/bin/`:
@@ -44,22 +44,22 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 
 ```bash
 # Basic build (default: Release mode, QNN + Hexagon backends)
-./docker/docker_compose_compile_and_share.sh
+./docker/docker_compose_compile.sh
 
 # Debug build with Hexagon NPU backend
-./docker/docker_compose_compile_and_share.sh -d --enable-hexagon-backend
+./docker/docker_compose_compile.sh -d --enable-hexagon-backend
 
 # Debug build with Hexagon NPU backend only
-./docker/docker_compose_compile_and_share.sh -d --hexagon-npu-only
+./docker/docker_compose_compile.sh -d --hexagon-npu-only
 
 # Debug build with Hexagon NPU backend and quantized tensor support
-./docker/docker_compose_compile_and_share.sh -d --hexagon-npu-only --enable-dequant
+./docker/docker_compose_compile.sh -d --hexagon-npu-only --enable-dequant
 
 # QNN-only build with performance logging
-./docker/docker_compose_compile_and_share.sh --qnn-only --perf-log
+./docker/docker_compose_compile.sh --qnn-only --perf-log
 
 # Force rebuild with debug symbols and build timing
-./docker/docker_compose_compile_and_share.sh -r -d --print-build-time
+./docker/docker_compose_compile.sh -r -d --print-build-time
 ```
 
 ## Windows
@@ -79,6 +79,15 @@ This guide describes the steps to build Android/Windows releases of the QNN back
      - **CMake tools** for Visual Studio
 
         ![VS2022 CMake Installation](https://github.com/user-attachments/assets/9a36dde5-0e41-4421-9161-e9b09cd32eb1)
+
+3. **Install Hexagon SDK (for Hexagon NPU backend)**
+   - To compile the `hexagon-npu` backend, you need to install the latest Hexagon SDK
+   - Follow the [official documentation](https://docs.qualcomm.com/bundle/publicresource/topics/80-77512-1/hexagon-dsp-sdk-getting-started.html?product=1601111740010422):
+     1. First install the Qualcomm Package Manager (QPM)
+     2. Then use QPM to install the Hexagon SDK
+   - Set the environment variable `HEXAGON_SDK_ROOT` to point to your installation directory
+
+   > **Note**: The Hexagon SDK is only required if you plan to build with `--enable-hexagon-backend` or `--hexagon-npu-only` flags.
 
 ### Build Steps
 
@@ -124,4 +133,4 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 After successful compilation, you'll find the following executables:
 - `llama-cli.exe` - Main inference executable
 - `llama-bench.exe` - Benchmarking tool
-- `test-backend-ops.exe` - Backend operation tests
+- `test-backend-ops.exe` - Backend operation tests 
