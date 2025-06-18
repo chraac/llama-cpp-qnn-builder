@@ -17,7 +17,7 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 
 1. Navigate to the project root directory and run the build script:
    ```bash
-   ./docker/docker_compose_compile_and_share.sh
+   ./docker/docker_compose_compile.sh
    ```
 
 2. The console output will look similar to this, and executables will be located in `build_qnn_arm64-v8a/bin/`:
@@ -44,22 +44,22 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 
 ```bash
 # Basic build (default: Release mode, QNN + Hexagon backends)
-./docker/docker_compose_compile_and_share.sh
+./docker/docker_compose_compile.sh
 
 # Debug build with Hexagon NPU backend
-./docker/docker_compose_compile_and_share.sh -d --enable-hexagon-backend
+./docker/docker_compose_compile.sh -d --enable-hexagon-backend
 
 # Debug build with Hexagon NPU backend only
-./docker/docker_compose_compile_and_share.sh -d --hexagon-npu-only
+./docker/docker_compose_compile.sh -d --hexagon-npu-only
 
 # Debug build with Hexagon NPU backend and quantized tensor support
-./docker/docker_compose_compile_and_share.sh -d --hexagon-npu-only --enable-dequant
+./docker/docker_compose_compile.sh -d --hexagon-npu-only --enable-dequant
 
 # QNN-only build with performance logging
-./docker/docker_compose_compile_and_share.sh --qnn-only --perf-log
+./docker/docker_compose_compile.sh --qnn-only --perf-log
 
 # Force rebuild with debug symbols and build timing
-./docker/docker_compose_compile_and_share.sh -r -d --print-build-time
+./docker/docker_compose_compile.sh -r -d --print-build-time
 ```
 
 ## Windows
