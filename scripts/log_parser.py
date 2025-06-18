@@ -254,7 +254,8 @@ def get_file_encoding(file_name: str) -> str | None:
     :return: The detected encoding, or 'utf-8' if detection fails.
     """
     enc_list = [
-        'utf_16_beUTF-16BEall',
+        'utf_16_be',
+        'UTF-16BEall',
         'utf_16_le',
         'utf_8',
         'unicode_escape',
