@@ -82,8 +82,15 @@ jobs:
         id: install_ninja
         run: |
           choco install ninja
-      - name: Install Qualcomm Ai Engine SDK
-        id: get_qnn_sdk
+      - name: Cache Qualcomm Ai Engine SDK
+        id: cache-qnn-sdk
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.QNN_BASE_PATH }}
+          key: qnn-${{ env.QNN_VERSION }}-${{ runner.os }}
+      - if: ${{ steps.cache-qnn-sdk.outputs.cache-hit != 'true' }}
+        name: Install Qualcomm Ai Engine SDK
+        id: get-qnn-sdk
         run: |
           curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/${env:QNN_VERSION}/v${env:QNN_VERSION}.zip"
           7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -o"${env:QNN_BASE_PATH}"
