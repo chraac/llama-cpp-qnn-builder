@@ -79,7 +79,6 @@ jobs:
           git submodule update --init --recursive --checkout
           git submodule update --recursive
       - name: Install Ninja
-        id: install_ninja
         run: |
           choco install ninja
       - name: Cache Qualcomm Ai Engine SDK
@@ -94,6 +93,8 @@ jobs:
         run: |
           curl.exe -o $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -L "https://softwarecenter.qualcomm.com/api/download/software/sdks/Qualcomm_AI_Runtime_Community/All/${env:QNN_VERSION}/v${env:QNN_VERSION}.zip"
           7z x $env:RUNNER_TEMP/v${env:QNN_VERSION}.zip -o"${env:QNN_BASE_PATH}"
+      - name: Set up QNN SDK envs
+        run: |
           Add-Content $env:GITHUB_ENV "QNN_SDK_PATH=${env:QNN_BASE_PATH}/qairt/${env:QNN_VERSION}"
       - name: Build
         run: |
