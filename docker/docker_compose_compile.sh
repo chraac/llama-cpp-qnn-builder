@@ -1,16 +1,13 @@
 _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 _llama_cpp_repo_dir="$_script_dir/../llama.cpp"
 _llama_cpp_output_dir="$_script_dir/../build_qnn"
-_smb_share_dir="$HOME/smb_shared/qnn/"
 _rebuild=0
 _build_type='Release'
-_copy_to_smb=0
 _user_id=$(id -u)
 _reset_submodules=0
 _update_submodules=0
 _in_ci=0
 _pull_latest=0
-_print_build_time=0
 _build_platform='android' # default build platform, could be 'android' or 'linux'
 _build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
 _build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on -DLLAMA_CURL=off'
@@ -37,10 +34,6 @@ while (("$#")); do
         _build_type='Debug'
         shift
         ;;
-    -s | --smb)
-        _copy_to_smb=1
-        shift
-        ;;
     --reset-submodules)
         _reset_submodules=1
         shift
@@ -55,10 +48,6 @@ while (("$#")); do
         ;;
     --pull)
         _pull_latest=1
-        shift
-        ;;
-    --print-build-time)
-        _print_build_time=1
         shift
         ;;
     --asan)
@@ -162,9 +151,7 @@ echo "build_type: $_build_type"
 echo "disable_hexagon_and_qnn: $_disable_hexagon_and_qnn"
 echo "------------------------------------------------------------"
 
-if [ $_print_build_time -eq 1 ]; then
-    _start_time=$(date +%s)
-fi
+_start_time=$(date +%s)
 
 mkdir -p $_llama_cpp_output_dir
 pushd "$_script_dir"
@@ -197,10 +184,6 @@ $_compose_command build --pull
 $_compose_command up --build $_extra_args
 _build_end=$(date +%s)
 
-if [ $_copy_to_smb -eq 1 ]; then
-    rsync -avL --omit-dir-times --progress $_llama_cpp_output_dir $_smb_share_dir
-fi
-
 if [ $_run_backend_tests -eq 1 ]; then
     LD_LIBRARY_PATH="$_script_dir/../build_qnn_x86_64:$LD_LIBRARY_PATH" "$_script_dir/../build_qnn_x86_64/test-backend-ops" test -b qnn-cpu
     LD_LIBRARY_PATH="$_script_dir/../build_qnn_x86_64:$LD_LIBRARY_PATH" "$_script_dir/../build_qnn_x86_64/test-backend-ops" test -b qnn-npu
@@ -212,11 +195,9 @@ set +e
 
 popd
 
-if [ $_print_build_time -eq 1 ]; then
-    _total_build_time=$((($_build_end - $_start_time)))
-    _total_test_time=$((($_run_test_end - $_build_end)))
-    # print total time in min and sec
-    echo "Total build time: $(($_total_build_time / 60)) min $(($_total_build_time % 60)) sec"
-    echo "Total test time: $(($_total_test_time / 60)) min $(($_total_test_time % 60)) sec"
-fi
+_total_build_time=$((($_build_end - $_start_time)))
+_total_test_time=$((($_run_test_end - $_build_end)))
+# print total time in min and sec
+echo "Total build time: $(($_total_build_time / 60)) min $(($_total_build_time % 60)) sec"
+echo "Total test time: $(($_total_test_time / 60)) min $(($_total_test_time % 60)) sec"
 echo "All succeeded, build_type: $_build_type, revision: $_repo_git_hash"
