@@ -1,10 +1,8 @@
 _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 _llama_cpp_repo_dir="$_script_dir/../llama.cpp"
 _llama_cpp_output_dir="$_script_dir/../build_qnn"
-_smb_share_dir="$HOME/smb_shared/qnn/"
 _rebuild=0
 _build_type='Release'
-_copy_to_smb=0
 _user_id=$(id -u)
 _reset_submodules=0
 _update_submodules=0
@@ -34,10 +32,6 @@ while (("$#")); do
         ;;
     -d | --debug)
         _build_type='Debug'
-        shift
-        ;;
-    -s | --smb)
-        _copy_to_smb=1
         shift
         ;;
     --reset-submodules)
@@ -189,10 +183,6 @@ fi
 $_compose_command build --pull
 $_compose_command up --build $_extra_args
 _build_end=$(date +%s)
-
-if [ $_copy_to_smb -eq 1 ]; then
-    rsync -avL --omit-dir-times --progress $_llama_cpp_output_dir $_smb_share_dir
-fi
 
 if [ $_run_backend_tests -eq 1 ]; then
     LD_LIBRARY_PATH="$_script_dir/../build_qnn_x86_64:$LD_LIBRARY_PATH" "$_script_dir/../build_qnn_x86_64/test-backend-ops" test -b qnn-cpu
