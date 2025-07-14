@@ -30,7 +30,6 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 | `--rebuild`                 | `-r`  | Force rebuild of the project               | `false`             |
 | `--repo-dir`                |       | Specify llama.cpp repository directory     | `../llama.cpp`      |
 | `--debug`                   | `-d`  | Build in Debug mode                        | `Release`           |
-| `--print-build-time`        |       | Display build and test execution times     | `false`             |
 | `--asan`                    |       | Enable AddressSanitizer                    | `false`             |
 | `--build-linux-x64`         |       | Build for Linux x86_64 platform            | `android arm64-v8a` |
 | `--perf-log`                |       | Enable Hexagon performance tracking        | `false`             |
@@ -58,9 +57,38 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 # QNN-only build with performance logging
 ./docker/docker_compose_compile.sh --qnn-only --perf-log
 
-# Force rebuild with debug symbols and build timing
-./docker/docker_compose_compile.sh -r -d --print-build-time
+# Force rebuild with debug symbols
+./docker/docker_compose_compile.sh -r -d
 ```
+
+### How to create hexagon sdk build image
+
+To build with Hexagon NPU backend support, you need to create a Docker image that includes the Hexagon SDK. This process requires downloading the Hexagon SDK manually due to licensing requirements.
+#### Prerequisites
+
+1. **Download Hexagon SDK**
+   - Visit the [Hexagon NPU SDK - Getting started](https://docs.qualcomm.com/bundle/publicresource/topics/80-77512-1/hexagon-dsp-sdk-getting-started.html?product=1601111740010422)
+   - Follow the instructions to install the Hexagon SDK version 5.5.3.0 for Linux
+     1. First install the Qualcomm Package Manager (QPM)
+     2. Then use QPM to install the Hexagon SDK
+   - Set the environment variable `HEXAGON_SDK_ROOT` to point to your installation directory, liked: 
+
+#### Building the Hexagon SDK Image
+
+1. **Build the base QNN builder image first** (if not already built):
+   ```bash
+   ./docker_compose_build_and_push.sh
+   ```
+
+2. **Build the Hexagon SDK image**:
+   ```bash
+   ./docker_compose_hexagon_build_and_push.sh
+   ```
+
+   To build without cache:
+   ```bash
+   ./docker_compose_hexagon_build_and_push.sh -n
+   ```
 
 ## Windows
 
@@ -82,7 +110,7 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 
 3. **Install Hexagon SDK (for Hexagon NPU backend)**
    - To compile the `hexagon-npu` backend, you need to install the latest Hexagon SDK
-   - Follow the [official documentation](https://docs.qualcomm.com/bundle/publicresource/topics/80-77512-1/hexagon-dsp-sdk-getting-started.html?product=1601111740010422):
+   - Follow the [Hexagon NPU SDK - Getting started](https://docs.qualcomm.com/bundle/publicresource/topics/80-77512-1/hexagon-dsp-sdk-getting-started.html?product=1601111740010422):
      1. First install the Qualcomm Package Manager (QPM)
      2. Then use QPM to install the Hexagon SDK
    - Set the environment variable `HEXAGON_SDK_ROOT` to point to your installation directory
