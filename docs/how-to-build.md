@@ -64,35 +64,137 @@ This guide describes the steps to build Android/Windows releases of the QNN back
 ### How to create hexagon sdk build image
 
 To build with Hexagon NPU backend support, you need to create a Docker image that includes the Hexagon SDK. This process requires downloading the Hexagon SDK manually due to licensing requirements.
-#### Prerequisites
+
+#### SDK Download Requirements
 
 1. **Download Hexagon SDK**
    - Visit the [Hexagon NPU SDK - Getting started](https://docs.qualcomm.com/bundle/publicresource/topics/80-77512-1/hexagon-dsp-sdk-getting-started.html?product=1601111740010422)
-   - Follow the instructions to install the Hexagon SDK version 5.5.3.0 for Linux
-     1. First install the Qualcomm Package Manager (QPM)
-     2. Then use QPM to install the Hexagon SDK
-   - Set the environment variable `HEXAGON_SDK_ROOT` to point to your installation directory, liked: 
+   - Download and install the Hexagon SDK version **6.3.0.0** for Linux
 
-#### Building the Hexagon SDK Image
+2. **Base Docker Image**
+   - Ensure you have the base QNN builder image: `chraac/llama-cpp-qnn-builder:2.36.0.250627-ndk-r27`
+   - This image includes Android NDK r27c and necessary build tools
 
-1. **Build the base QNN builder image first** (if not already built):
-   ```bash
-   ./docker_compose_build_and_push.sh
+#### Building the Hexagon SDK Image with Local SDK Folder
+
+If you already have the Hexagon SDK extracted on your local machine, follow these steps:
+
+1. **Create a new Dockerfile** (save as `Dockerfile.hexagon_sdk.local`):
+
+   ```dockerfile
+   FROM chraac/llama-cpp-qnn-builder:2.36.0.250627-ndk-r27
+
+   ENV HEXAGON_SDK_VERSION='6.3.0.0'
+   ENV HEXAGON_SDK_BASE=/local/mnt/workspace/Qualcomm/Hexagon_SDK
+   ENV HEXAGON_SDK_PATH=${HEXAGON_SDK_BASE}/${HEXAGON_SDK_VERSION}
+   ENV ANDROID_NDK_HOME=/android-ndk/android-ndk-r27c
+   ENV ANDROID_ROOT_DIR=${ANDROID_NDK_HOME}/
+
+   RUN mkdir -p ${HEXAGON_SDK_PATH}
+
+   # Install required dependencies
+   RUN apt update && apt install -y \
+       python-is-python3 \
+       libncurses5 \
+       lsb-base \
+       lsb-release \
+       sqlite3 \
+       rsync \
+       git \
+       build-essential \
+       libc++-dev \
+       clang \
+       cmake
+
+   # Dummy version info for hexagon-sdk 
+   RUN echo 'VERSION_ID="20.04"' > /etc/os-release
    ```
 
-2. **Build the Hexagon SDK image**:
+2. **Build the Docker image with SDK folder mounted**:
+
    ```bash
-   ./docker_compose_hexagon_build_and_push.sh
+   # Replace /path/to/your/Hexagon_SDK/6.3.0.0 with your actual SDK path
+   docker build -f Dockerfile.hexagon_sdk.local -t llama-cpp-qnn-hexagon:local .
+   
+   # Run the container with the SDK directory mounted
+   docker run -it --rm \
+     -v /path/to/your/Hexagon_SDK/6.3.0.0:/local/mnt/workspace/Qualcomm/Hexagon_SDK/6.3.0.0 \
+     llama-cpp-qnn-hexagon:local bash
    ```
 
-   To build without cache:
+3. **Create a convenience script** (save as `docker_compose_hexagon_local.sh`):
+
    ```bash
-   ./docker_compose_hexagon_build_and_push.sh -n
+   #!/bin/bash
+   
+   # Check if SDK path is provided
+   if [ -z "$1" ]; then
+     echo "Usage: $0 /path/to/hexagon/sdk/6.3.0.0"
+     exit 1
+   fi
+   
+   SDK_PATH="$1"
+   
+   # Check if SDK path exists
+   if [ ! -d "$SDK_PATH" ]; then
+     echo "Error: SDK path does not exist: $SDK_PATH"
+     exit 1
+   fi
+   
+   # Build the Docker image
+   docker build -f Dockerfile.hexagon_sdk.local -t llama-cpp-qnn-hexagon:local .
+   
+   # Create a Docker Compose configuration file
+   cat > docker-compose.hexagon.yml << EOF
+   version: '3'
+   services:
+     hexagon-builder:
+       image: llama-cpp-qnn-hexagon:local
+       volumes:
+         - $SDK_PATH:/local/mnt/workspace/Qualcomm/Hexagon_SDK/6.3.0.0
+         - ./:/workspace
+       working_dir: /workspace
+   EOF
+   
+   echo "Setup complete! Use the following command to compile with Hexagon support:"
+   echo "./docker/docker_compose_compile.sh --enable-hexagon-backend"
    ```
+
+   Make the script executable:
+   ```bash
+   chmod +x docker_compose_hexagon_local.sh
+   ```
+
+4. **Run the setup script**:
+
+   ```bash
+   ./docker_compose_hexagon_local.sh /path/to/your/Hexagon_SDK/6.3.0.0
+   ```
+
+#### Using the Hexagon SDK Image
+
+Once the image is built with your local SDK mounted, you can use it for compiling llama.cpp with Hexagon NPU backend support:
+
+```bash
+# Build with Hexagon NPU backend enabled
+./docker/docker_compose_compile.sh --enable-hexagon-backend
+
+# Build with Hexagon NPU backend only
+./docker/docker_compose_compile.sh --hexagon-npu-only
+
+# Build with quantized tensor support
+./docker/docker_compose_compile.sh --hexagon-npu-only --enable-dequant
+```
+
+You can also enter the container directly for debugging or manual builds:
+
+```bash
+docker-compose -f docker-compose.hexagon.yml run --rm hexagon-builder bash
+```
 
 ## Windows
 
-### Prerequisites
+### Windows Prerequisites
 
 1. **Download Qualcomm AI Engine Direct SDK**
    - Get it from [Qualcomm Developer Portal](https://www.qualcomm.com/developer/software/qualcomm-ai-engine-direct-sdk)
@@ -159,6 +261,7 @@ To build with Hexagon NPU backend support, you need to create a Docker image tha
 ### Build Output
 
 After successful compilation, you'll find the following executables:
+
 - `llama-cli.exe` - Main inference executable
 - `llama-bench.exe` - Benchmarking tool
-- `test-backend-ops.exe` - Backend operation tests 
+- `test-backend-ops.exe` - Backend operation tests
