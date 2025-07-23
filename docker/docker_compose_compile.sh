@@ -18,80 +18,81 @@ _hexagon_npu_only=0
 _qnn_only=0
 _disable_hexagon_and_qnn=0
 _enable_dequant=0
+_enable_profiler=0
 
 # Parse command-line arguments
 while (("$#")); do
     case "$1" in
-    -r | --rebuild)
-        _rebuild=1
-        shift
+        -r | --rebuild)
+            _rebuild=1
+            shift
         ;;
-    --repo-dir)
-        _llama_cpp_repo_dir="$2"
-        shift 2
+        --repo-dir)
+            _llama_cpp_repo_dir="$2"
+            shift 2
         ;;
-    -d | --debug)
-        _build_type='Debug'
-        shift
+        -d | --debug)
+            _build_type='Debug'
+            shift
         ;;
-    --reset-submodules)
-        _reset_submodules=1
-        shift
+        --reset-submodules)
+            _reset_submodules=1
+            shift
         ;;
-    --update-submodules)
-        _update_submodules=1
-        shift
+        --update-submodules)
+            _update_submodules=1
+            shift
         ;;
-    --ci)
-        _in_ci=1
-        shift
+        --ci)
+            _in_ci=1
+            shift
         ;;
-    --pull)
-        _pull_latest=1
-        shift
+        --pull)
+            _pull_latest=1
+            shift
         ;;
-    --asan)
-        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
-        shift
+        --asan)
+            _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+            shift
         ;;
-    --build-linux-x64)
-        _build_platform='linux'
-        _build_arch='x86_64'
-        # disable the qnn cpu backend, let the test use ggml cpu backend to cross verify the results
-        _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
-        shift
+        --build-linux-x64)
+            _build_platform='linux'
+            _build_arch='x86_64'
+            # disable the qnn cpu backend, let the test use ggml cpu backend to cross verify the results
+            _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+            shift
         ;;
-    --perf-log)
-        _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_PERFORMANCE_TRACKING=on"
-        shift
+        --perf-log)
+            _enable_profiler=1
+            shift
         ;;
-    --enable-hexagon-backend)
-        _enable_hexagon_backend=1
-        shift
+        --enable-hexagon-backend)
+            _enable_hexagon_backend=1
+            shift
         ;;
-    --hexagon-npu-only)
-        _hexagon_npu_only=1
-        shift
+        --hexagon-npu-only)
+            _hexagon_npu_only=1
+            shift
         ;;
-    --disable-hexagon-and-qnn)
-        _disable_hexagon_and_qnn=1
-        shift
+        --disable-hexagon-and-qnn)
+            _disable_hexagon_and_qnn=1
+            shift
         ;;
-    --qnn-only)
-        _qnn_only=1
-        shift
+        --qnn-only)
+            _qnn_only=1
+            shift
         ;;
-    --run-tests)
-        _run_backend_tests=1
-        shift
+        --run-tests)
+            _run_backend_tests=1
+            shift
         ;;
-    --enable-dequant)
-        _enable_dequant=1
-        shift
+        --enable-dequant)
+            _enable_dequant=1
+            shift
         ;;
-    *) # preserve positional arguments
-        echo "Invalid option $1"
-        exit 1
+        *) # preserve positional arguments
+            echo "Invalid option $1"
+            exit 1
         ;;
     esac
 done
@@ -113,6 +114,10 @@ if [ $_enable_dequant -eq 1 ]; then
     _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=on"
 else
     _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=off"
+fi
+
+if [ $_enable_profiler -eq 1 ]; then
+    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_PERFORMANCE_TRACKING=on"
 fi
 
 _build_options="${_build_options} ${_extra_build_options}"
@@ -149,6 +154,10 @@ echo "build_platform: $_build_platform"
 echo "build_arch: $_build_arch"
 echo "build_type: $_build_type"
 echo "disable_hexagon_and_qnn: $_disable_hexagon_and_qnn"
+echo "enable_hexagon_backend: $_enable_hexagon_backend"
+echo "hexagon_npu_only: $_hexagon_npu_only"
+echo "qnn_only: $_qnn_only"
+echo "enable_profiler: $_enable_profiler"
 echo "------------------------------------------------------------"
 
 _start_time=$(date +%s)
@@ -200,4 +209,4 @@ _total_test_time=$((($_run_test_end - $_build_end)))
 # print total time in min and sec
 echo "Total build time: $(($_total_build_time / 60)) min $(($_total_build_time % 60)) sec"
 echo "Total test time: $(($_total_test_time / 60)) min $(($_total_test_time % 60)) sec"
-echo "All succeeded, build_type: $_build_type, revision: $_repo_git_hash"
+echo "All succeeded, build_type: $_build_type, profiler_enabled: ${_enable_profiler}, revision: $_repo_git_hash"
