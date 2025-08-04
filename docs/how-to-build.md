@@ -118,7 +118,7 @@ If you already have the Hexagon SDK extracted on your machine:
 
    RUN mkdir -p ${HEXAGON_SDK_PATH}
    ARG LOCAL_SDK_PATH
-   ADD ${LOCAL_SDK_PATH} ${HEXAGON_SDK_PATH}/6.3.0.0
+   ADD https://softwarecenter.qualcomm.com/api/download/software/sdks/Hexagon_SDK/Linux/Debian/${HEXAGON_SDK_VERSION}/Hexagon_SDK.zip
 
    # Install required dependencies
    RUN apt update && apt install -y \
@@ -132,7 +132,12 @@ If you already have the Hexagon SDK extracted on your machine:
        build-essential \
        libc++-dev \
        clang \
-       cmake
+       cmake \
+       unzip
+
+   # Unarchive Hexagon_SDK
+   RUN unzip -o /tmp/Hexagon_SDK.zip -d ${HEXAGON_SDK_BASE}/../ && \
+      rm -rf ${HEXAGON_SDK_BASE}/${TARGET_HEXAGON_SDK_VERSION}/tools/android-ndk-*
 
    # Dummy version info for hexagon-sdk 
    RUN echo 'VERSION_ID="20.04"' > /etc/os-release
@@ -158,7 +163,7 @@ If you already have the Hexagon SDK extracted on your machine:
    fi
 
    # Build the Docker image with SDK embedded
-   docker build -f Dockerfile.hexagon_sdk.local --build-arg LOCAL_SDK_PATH="$SDK_PATH" -t llama-cpp-qnn-hexagon:embedded .
+   docker build -f Dockerfile.hexagon_sdk.local -t llama-cpp-qnn-hexagon:embedded .
 
    # Create a Docker Compose configuration file
    cat > docker-compose.hexagon.yml << EOF
