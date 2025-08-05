@@ -117,7 +117,6 @@ If you already have the Hexagon SDK extracted on your machine:
    ENV ANDROID_ROOT_DIR=${ANDROID_NDK_HOME}/
 
    RUN mkdir -p ${HEXAGON_SDK_PATH}
-   ARG LOCAL_SDK_PATH
    ADD https://softwarecenter.qualcomm.com/api/download/software/sdks/Hexagon_SDK/Linux/Debian/${HEXAGON_SDK_VERSION}/Hexagon_SDK.zip
 
    # Install required dependencies
