@@ -136,7 +136,7 @@ If you already have the Hexagon SDK extracted on your machine:
 
    # Unarchive Hexagon_SDK
    RUN unzip -o /tmp/Hexagon_SDK.zip -d ${HEXAGON_SDK_BASE}/../ && \
-      rm -rf ${HEXAGON_SDK_BASE}/${TARGET_HEXAGON_SDK_VERSION}/tools/android-ndk-*
+      rm -rf ${HEXAGON_SDK_BASE}/${HEXAGON_SDK_VERSION}/tools/android-ndk-*
 
    # Dummy version info for hexagon-sdk 
    RUN echo 'VERSION_ID="20.04"' > /etc/os-release
