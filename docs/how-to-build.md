@@ -10,7 +10,7 @@ This guide describes how to build Android and Windows versions of the QNN backen
   - [Build Examples](#build-examples)
   - [Hexagon SDK Setup](#hexagon-sdk-setup)
     - [Prerequisites](#prerequisites)
-    - [Building the Hexagon SDK Image with Local SDK Folder](#building-the-hexagon-sdk-image-with-local-sdk-folder)
+    - [Building the Hexagon SDK Image](#building-the-hexagon-sdk-image)
 - [Windows Build](#windows-build)
   - [Windows Prerequisites](#windows-prerequisites)
   - [Windows Build Process](#windows-build-process)
@@ -93,17 +93,13 @@ To build with Hexagon NPU backend support, you need to create a Docker image tha
 
 #### Prerequisites
 
-1. **Hexagon SDK**
-   - Option 1: Download SDK from [Hexagon NPU SDK - Getting started](https://docs.qualcomm.com/bundle/publicresource/topics/80-77512-1/hexagon-dsp-sdk-getting-started.html?product=1601111740010422) (version **6.3.0.0** for Linux)
-   - Option 2: Use an existing SDK installation
-
-2. **Base Docker Image**
+1. **Base Docker Image**
    - Required image: `chraac/llama-cpp-qnn-builder:2.36.0.250627-ndk-r27`
    - Contains Android NDK r27c and build tools
 
-#### Building the Hexagon SDK Image with Local SDK Folder
+#### Building the Hexagon SDK Image
 
-If you already have the Hexagon SDK extracted on your machine:
+Now you can add the Hexagon SDK (community edition) url to your docker image directly.
 
 1. **Create Dockerfile** (save as `Dockerfile.hexagon_sdk.local`):
 
