@@ -179,7 +179,7 @@ Now you can add the Hexagon SDK (community edition) url to your docker image dir
 
    ```bash
    chmod +x docker_compose_hexagon_local.sh
-   ./docker_compose_hexagon_local.sh /path/to/your/Hexagon_SDK/6.3.0.0
+   ./docker_compose_hexagon_local.sh
    ```
 
 4. **Build with Hexagon Support**:
