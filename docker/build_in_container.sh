@@ -55,13 +55,6 @@ if [ "$TARGET_PLATFORM" = "android" ]; then
         exit 1
     fi
 
-    if [ "$BUILD_TYPE" = "Release" ]; then
-        # workaround for android ndk r23
-        # for more detail: https://github.com/android/ndk/issues/1740
-        BUILD_TYPE="MinSizeRel"
-        echo "Building for android release $BUILD_TYPE"
-    fi
-
     _android_ndk_options="-DANDROID_ABI=$TARGET_ARCH \
         -DANDROID_PLATFORM=$ANDROID_PLATFORM \
         -DANDROID_NDK=$ANDROID_NDK_HOME \
