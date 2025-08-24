@@ -7,7 +7,8 @@ _model_name='meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_K_M.gguf'
 _prompt='I believe the meaning of life is'
 _should_push_to_device=0
 _flash_attn=0
-_extra_args='-n 64 --ignore-eos'
+_max_tokens=1024
+_extra_args="-n $_max_tokens --ignore-eos"
 
 # parse arguments to get the log file name
 while [[ $# -gt 0 ]]; do
