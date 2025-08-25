@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
     -v | --verbose)
-        _extra_args="-v"
+        _extra_args="$_extra_args -v"
         shift
         ;;
     -p | --push-to-device)
