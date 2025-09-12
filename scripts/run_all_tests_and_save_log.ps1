@@ -6,7 +6,7 @@ param (
     [string]$ExtraArgs = "test",
     
     [Alias('-l')]
-    [string]$LogFileName = "test-backend-ops_all"
+    [string]$LogFileName = "test-backend-ops-all"
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
