@@ -31,6 +31,11 @@ while [[ $# -gt 0 ]]; do
         _flash_attn=1
         shift
         ;;
+    -t | --max-tokens)
+        _max_tokens="$2"
+        shift
+        shift
+        ;;
     *)
         echo "Invalid option $1"
         exit 1

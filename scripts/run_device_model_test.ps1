@@ -10,15 +10,17 @@ param (
 
     [Alias('-f')]
     [switch]$FlashAttention
+
+    [Alias('-t')]
+    [switch]$MaxTokens = 512
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $deviceExecPath = '/data/local/tmp'
 $deviceModelPath = '/sdcard'
-$maxTokens = 512
 $prompt = 'I believe the meaning of life is'
 
-$extraArgs = "-n $maxTokens --ignore-eos"
+$extraArgs = "-n $MaxTokens --ignore-eos"
 # Set extraArgs based on Verbose if not explicitly provided
 if ($Verbose) {
     $extraArgs = "$extraArgs -v"
