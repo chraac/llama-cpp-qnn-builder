@@ -209,4 +209,4 @@ _total_test_time=$((($_run_test_end - $_build_end)))
 # print total time in min and sec
 echo "Total build time: $(($_total_build_time / 60)) min $(($_total_build_time % 60)) sec"
 echo "Total test time: $(($_total_test_time / 60)) min $(($_total_test_time % 60)) sec"
-echo "All succeeded, build_type: $_build_type, profiler_enabled: ${_enable_profiler}, revision: $_repo_git_hash"
+echo "All succeeded, build: ${_build_type}, dequant: ${_enable_dequant}, profiler: ${_enable_profiler}, revision: ${_repo_git_hash}"
