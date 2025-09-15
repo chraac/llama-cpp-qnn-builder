@@ -37,7 +37,7 @@ if ($PushToDevice) {
 }
 
 if ($FlashAttention) {
-    $extraArgs += " --flash-attn"
+    $extraArgs += " --flash-attn on"
 }
 
 Write-Host "ExtraArgs: $extraArgs"

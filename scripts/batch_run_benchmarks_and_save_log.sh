@@ -56,7 +56,7 @@ if [ $_verbose_log -eq 1 ]; then
 fi
 
 if [ $_flash_attn -eq 1 ]; then
-    _extra_args="${_extra_args} --flash-attn 1"
+    _extra_args="${_extra_args} --flash-attn on"
 fi
 
 log_file_path="$_script_path/../run_logs/$_log_file_name"

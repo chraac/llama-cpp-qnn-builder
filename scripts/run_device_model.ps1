@@ -27,7 +27,7 @@ if ($PushToDevice) {
 }
 
 if ($FlashAttention) {
-    $extraArgs += " --flash-attn"
+    $extraArgs += " --flash-attn on"
 }
 
 $deviceCommandString = "cd $deviceExecPath && "
