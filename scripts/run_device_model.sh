@@ -41,7 +41,7 @@ if [ $_should_push_to_device -eq 1 ]; then
 fi
 
 if [ $_flash_attn -eq 1 ]; then
-    _extra_args="${_extra_args} --flash-attn"
+    _extra_args="${_extra_args} --flash-attn on"
 fi
 
 device_command_string="cd $_device_exec_path && "

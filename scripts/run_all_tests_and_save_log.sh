@@ -2,7 +2,7 @@
 
 _SCRIPT_PATH=$(dirname "$(realpath "$0")")
 _DEVICE_PATH='/data/local/tmp'
-_LOG_FILE_NAME="test-backend-ops_all"
+_LOG_FILE_NAME="test-backend-ops-all"
 _LOG_FILE_EXTENSION=".log"
 _LOG_FILE_PATH="$_SCRIPT_PATH/../run_logs/${_LOG_FILE_NAME}$_LOG_FILE_EXTENSION"
 _LOGCAT_OUTPUT_PATH="$_SCRIPT_PATH/../run_logs/${_LOG_FILE_NAME}.logcat$_LOG_FILE_EXTENSION"
