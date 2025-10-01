@@ -58,7 +58,12 @@ adb shell $deviceCommandString 2>&1 | Out-File -FilePath $logFilePath
 
 # Stop the logcat process
 if ($null -ne $logcatProcess -and !$logcatProcess.HasExited) {
-    $logcatProcess.Kill()
+    try {
+        $logcatProcess.Kill()
+    }
+    catch {
+        Write-Warning "Failed to kill logcat process: $($_.Exception.Message)"
+    }
 }
 
 # Filter the logcat output and save to the output file
