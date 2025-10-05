@@ -59,7 +59,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Debug
-        run: docker/docker_compose_compile.sh -r -d --enable-hexagon-backend --enable-dequant
+        run: docker/docker_compose_compile.sh -r -d --enable-dequant
       - name: Build Release
         run: docker/docker_compose_compile.sh -r --hexagon-npu-only --enable-dequant
   build-windows-qnn:
