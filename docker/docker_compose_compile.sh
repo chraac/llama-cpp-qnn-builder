@@ -13,7 +13,7 @@ _build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
 _build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on -DLLAMA_CURL=off'
 _extra_build_options=''
 _run_backend_tests=0
-_enable_hexagon_backend=0
+_enable_hexagon_backend=1
 _hexagon_npu_only=0
 _qnn_only=0
 _disable_hexagon_and_qnn=0
@@ -66,8 +66,8 @@ while (("$#")); do
             _enable_profiler=1
             shift
         ;;
-        --enable-hexagon-backend)
-            _enable_hexagon_backend=1
+        --disable-hexagon-backend)
+            _enable_hexagon_backend=0
             shift
         ;;
         --hexagon-npu-only)
