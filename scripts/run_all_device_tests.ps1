@@ -38,7 +38,7 @@ if (-not $TestOnly) {
     & "$scriptPath/run_device_model_test.ps1" -f -m:"meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_0.gguf" -l:"$modelTestLogName" -t:512
 
     Write-Host "Running device benchmarks and saving log to $benchmarkLogName"
-    & "$scriptPath/batch_run_benchmarks_and_save_log.ps1" -l:"$benchmarkLogName" -s -f
+    & "$scriptPath/batch_run_benchmarks_and_save_log.ps1" -l:"$benchmarkLogName.log" -s -f
 }
 
 if (-not $BenchmarksOnly) {

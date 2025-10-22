@@ -82,7 +82,7 @@ if [[ $test_only -eq 0 ]]; then
     
     echo "Running device benchmarks and saving log to ${benchmark_log_name}"
     "${_script_path}/batch_run_benchmarks_and_save_log.sh" \
-    -l "${benchmark_log_name}" \
+    -l "${benchmark_log_name}.log" \
     -s \
     -f
 fi
