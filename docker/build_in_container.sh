@@ -80,7 +80,8 @@ fi
 if [ $GGML_HEXAGON -eq 1 ]; then
     echo "Using official GGML hexagon support"
     # See also: https://github.com/CodeLinaro/llama.cpp/blob/hexagon/docs/backend/hexagon/README.md
-    _extra_options="${_extra_options} -DGGML_HEXAGON=on -DGGML_OPENMP=off -DGGML_QNN=off -DGGML_QNN_ENABLE_HEXAGON_BACKEND=off -DHEXAGON_SDK_ROOT=${HEXAGON_SDK_PATH}"
+    _extra_options="${_extra_options} -DGGML_QNN=off -DGGML_QNN_ENABLE_HEXAGON_BACKEND=off"
+    _extra_options="${_extra_options} -DGGML_HEXAGON=on -DGGML_OPENMP=off -DHEXAGON_SDK_ROOT=${HEXAGON_SDK_PATH} -DPREBUILT_LIB_DIR=android_aarch64"
 else
     echo "Using custom hexagon support"
     if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
