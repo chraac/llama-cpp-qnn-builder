@@ -126,6 +126,8 @@ fi
 
 if [ $DISABLE_HEXAGON_AND_QNN -eq 0 ]; then
     rsync -av ./bin/*.so $OUTPUT_DIR
+elif [ $GGML_HEXAGON -eq 1 ]; then
+    rsync -av ./ggml/src/ggml-hexagon/*.so $OUTPUT_DIR
 fi
 
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
