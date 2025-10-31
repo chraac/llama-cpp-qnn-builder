@@ -5,6 +5,7 @@ _cpu_count="$(nproc)"
 echo "LOCAL_REPO_DIR: $LOCAL_REPO_DIR"
 echo "QNN_SDK_PATH: $QNN_SDK_PATH"
 echo "HEXAGON_SDK_PATH: $HEXAGON_SDK_PATH"
+echo "GGML_HEXAGON: $GGML_HEXAGON"
 echo "BUILD_HEXAGON_BACKEND: $BUILD_HEXAGON_BACKEND"
 echo "BUILD_HEXAGON_NPU_ONLY: $BUILD_HEXAGON_NPU_ONLY"
 echo "DISABLE_HEXAGON_AND_QNN: $DISABLE_HEXAGON_AND_QNN"
@@ -76,22 +77,29 @@ else
     exit 1
 fi
 
-if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
-    _extra_options="${_extra_options} -DGGML_QNN_ENABLE_HEXAGON_BACKEND=on"
-fi
-
-if [ $BUILD_HEXAGON_NPU_ONLY -eq 1 ]; then
-    echo "Building for Hexagon NPU only"
-    _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=on"
+if [ $GGML_HEXAGON -eq 1 ]; then
+    echo "Using official GGML hexagon support"
+    # See also: https://github.com/CodeLinaro/llama.cpp/blob/hexagon/docs/backend/hexagon/README.md
+    _extra_options="${_extra_options} -DGGML_HEXAGON=on -DGGML_OPENMP=off -DGGML_QNN=off -DGGML_QNN_ENABLE_HEXAGON_BACKEND=off"
 else
-    _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=off"
-fi
+    echo "Using custom hexagon support"
+    if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
+        _extra_options="${_extra_options} -DGGML_QNN_ENABLE_HEXAGON_BACKEND=on"
+    fi
 
-if [ $DISABLE_HEXAGON_AND_QNN -eq 1 ]; then
-    echo "Building for cpu only"
-    _extra_options="${_extra_options} -DGGML_QNN=off"
-else
-    _extra_options="${_extra_options} -DGGML_QNN=on"
+    if [ $BUILD_HEXAGON_NPU_ONLY -eq 1 ]; then
+        echo "Building for Hexagon NPU only"
+        _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=on"
+    else
+        _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=off"
+    fi
+
+    if [ $DISABLE_HEXAGON_AND_QNN -eq 1 ]; then
+        echo "Building for cpu only"
+        _extra_options="${_extra_options} -DGGML_QNN=off"
+    else
+        _extra_options="${_extra_options} -DGGML_QNN=on"
+    fi
 fi
 
 # Build llama

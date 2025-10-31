@@ -17,6 +17,7 @@ _enable_hexagon_backend=1
 _hexagon_npu_only=0
 _qnn_only=0
 _disable_hexagon_and_qnn=0
+_use_ggml_hexagon=0
 _enable_dequant=0
 _enable_profiler=0
 
@@ -90,6 +91,10 @@ while (("$#")); do
             _enable_dequant=1
             shift
         ;;
+        --use-ggml-hexagon)
+            _use_ggml_hexagon=1
+            shift
+        ;;
         *) # preserve positional arguments
             echo "Invalid option $1"
             exit 1
@@ -97,28 +102,35 @@ while (("$#")); do
     esac
 done
 
-if [ $_enable_hexagon_backend -eq 1 ]; then
-    export BUILD_HEXAGON_BACKEND=1
-else
+if [ $_use_ggml_hexagon -eq 1 ]; then
+    export GGML_HEXAGON=1
     export BUILD_HEXAGON_BACKEND=0
-fi
-
-if [ $_hexagon_npu_only -eq 1 ]; then
-    export BUILD_HEXAGON_NPU_ONLY=1
-    export BUILD_HEXAGON_BACKEND=1
-else
     export BUILD_HEXAGON_NPU_ONLY=0
-fi
-
-if [ $_enable_dequant -eq 1 ]; then
-    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=on"
 else
-    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=off"
+    if [ $_enable_hexagon_backend -eq 1 ]; then
+    export BUILD_HEXAGON_BACKEND=1
+    else
+        export BUILD_HEXAGON_BACKEND=0
+    fi
+
+    if [ $_hexagon_npu_only -eq 1 ]; then
+        export BUILD_HEXAGON_NPU_ONLY=1
+        export BUILD_HEXAGON_BACKEND=1
+    else
+        export BUILD_HEXAGON_NPU_ONLY=0
+    fi
+
+    if [ $_enable_dequant -eq 1 ]; then
+        _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=on"
+    else
+        _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=off"
+    fi
+
+    if [ $_enable_profiler -eq 1 ]; then
+        _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_PERFORMANCE_TRACKING=on"
+    fi
 fi
 
-if [ $_enable_profiler -eq 1 ]; then
-    _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_PERFORMANCE_TRACKING=on"
-fi
 
 _build_options="${_build_options} ${_extra_build_options}"
 
