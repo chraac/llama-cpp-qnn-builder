@@ -10,7 +10,7 @@ _in_ci=0
 _pull_latest=0
 _build_platform='android' # default build platform, could be 'android' or 'linux'
 _build_arch='arm64-v8a'   # default build arch, could be 'arm64-v8a' or 'x86_64'
-_build_options='-DBUILD_SHARED_LIBS=off -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on -DLLAMA_CURL=off'
+_build_options='-DBUILD_SHARED_LIBS=off -DLLAMA_CURL=off'
 _extra_build_options=''
 _run_backend_tests=0
 _enable_hexagon_backend=1
@@ -106,7 +106,9 @@ if [ $_use_ggml_hexagon -eq 1 ]; then
     export GGML_HEXAGON=1
     export BUILD_HEXAGON_BACKEND=0
     export BUILD_HEXAGON_NPU_ONLY=0
+    _build_options="${_build_options} -DGGML_QNN_ENABLE_CPU_BACKEND=off -DGGML_OPENMP=off"
 else
+    _build_options="${_build_options} -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on"
     if [ $_enable_hexagon_backend -eq 1 ]; then
     export BUILD_HEXAGON_BACKEND=1
     else
@@ -129,6 +131,7 @@ else
     if [ $_enable_profiler -eq 1 ]; then
         _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_PERFORMANCE_TRACKING=on"
     fi
+    export GGML_HEXAGON=0
 fi
 
 
