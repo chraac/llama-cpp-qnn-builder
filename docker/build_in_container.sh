@@ -2,9 +2,13 @@
 
 _cpu_count="$(nproc)"
 
+LOCAL_BUILD_DIR='/llama_cpp_build'
+
 echo "LOCAL_REPO_DIR: $LOCAL_REPO_DIR"
+echo "LOCAL_BUILD_DIR: $LOCAL_BUILD_DIR"
 echo "QNN_SDK_PATH: $QNN_SDK_PATH"
 echo "HEXAGON_SDK_PATH: $HEXAGON_SDK_PATH"
+echo "GGML_HEXAGON: $GGML_HEXAGON"
 echo "BUILD_HEXAGON_BACKEND: $BUILD_HEXAGON_BACKEND"
 echo "BUILD_HEXAGON_NPU_ONLY: $BUILD_HEXAGON_NPU_ONLY"
 echo "DISABLE_HEXAGON_AND_QNN: $DISABLE_HEXAGON_AND_QNN"
@@ -36,12 +40,12 @@ fi
 mkdir -p $LOCAL_REPO_DIR
 chmod 777 $LOCAL_REPO_DIR
 cd $LOCAL_REPO_DIR
-rsync -a --delete --exclude='env' --exclude='run_server.sh' --exclude='build_*' --exclude='build' --exclude='models*' --exclude='.vs*' --exclude='.git/objects*' /mnt/llama_cpp_mount/ ./
+rsync -au --delete --exclude='env' --exclude='run_server.sh' --exclude='build_*' --exclude='build' --exclude='*.gguf' --exclude='.vs*' --exclude='.git/objects*' /mnt/llama_cpp_mount/ ./
 git config --global --add safe.directory $LOCAL_REPO_DIR
 echo "compiling git revision: $(git rev-parse --short HEAD)"
-mkdir -p ./build_qnn
-rm -rf ./build_qnn/*
-cd ./build_qnn
+mkdir -p "${LOCAL_BUILD_DIR}"
+rm -rf "${LOCAL_BUILD_DIR}/*"
+cd "${LOCAL_BUILD_DIR}"
 set -e
 
 _extra_options="$CMAKE_EXTRA_BUILD_OPTIONS"
@@ -76,29 +80,37 @@ else
     exit 1
 fi
 
-if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
-    _extra_options="${_extra_options} -DGGML_QNN_ENABLE_HEXAGON_BACKEND=on"
-fi
-
-if [ $BUILD_HEXAGON_NPU_ONLY -eq 1 ]; then
-    echo "Building for Hexagon NPU only"
-    _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=on"
+if [ $GGML_HEXAGON -eq 1 ]; then
+    echo "Using official GGML hexagon support"
+    # See also: https://github.com/CodeLinaro/llama.cpp/blob/hexagon/docs/backend/hexagon/README.md
+    _extra_options="${_extra_options} -DGGML_QNN=off -DGGML_QNN_ENABLE_HEXAGON_BACKEND=off"
+    _extra_options="${_extra_options} -DGGML_HEXAGON=on -DGGML_OPENMP=off -DHEXAGON_SDK_ROOT=${HEXAGON_SDK_PATH} -DPREBUILT_LIB_DIR=android_aarch64"
 else
-    _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=off"
-fi
+    echo "Using custom hexagon support"
+    if [ $BUILD_HEXAGON_BACKEND -eq 1 ]; then
+        _extra_options="${_extra_options} -DGGML_QNN_ENABLE_HEXAGON_BACKEND=on"
+    fi
 
-if [ $DISABLE_HEXAGON_AND_QNN -eq 1 ]; then
-    echo "Building for cpu only"
-    _extra_options="${_extra_options} -DGGML_QNN=off"
-else
-    _extra_options="${_extra_options} -DGGML_QNN=on"
+    if [ $BUILD_HEXAGON_NPU_ONLY -eq 1 ]; then
+        echo "Building for Hexagon NPU only"
+        _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=on"
+    else
+        _extra_options="${_extra_options} -DGGML_HEXAGON_NPU_ONLY=off"
+    fi
+
+    if [ $DISABLE_HEXAGON_AND_QNN -eq 1 ]; then
+        echo "Building for cpu only"
+        _extra_options="${_extra_options} -DGGML_QNN=off"
+    else
+        _extra_options="${_extra_options} -DGGML_QNN=on"
+    fi
 fi
 
 # Build llama
-cmake -H.. -B. $_extra_options \
+cmake -H"${LOCAL_REPO_DIR}" -B"${LOCAL_BUILD_DIR}" $_extra_options \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-cmake --build . --config $BUILD_TYPE -- -j$_cpu_count
+cmake --build "${LOCAL_BUILD_DIR}" --config $BUILD_TYPE -- -j$_cpu_count
 
 # Copy the output files to the output directory
 chmod -R u+rw $OUTPUT_DIR
@@ -117,6 +129,8 @@ fi
 
 if [ $DISABLE_HEXAGON_AND_QNN -eq 0 ]; then
     rsync -av ./bin/*.so $OUTPUT_DIR
+elif [ $GGML_HEXAGON -eq 1 ]; then
+    rsync -av ./ggml/src/ggml-hexagon/*.so $OUTPUT_DIR
 fi
 
 chown -R "$HOST_USER_ID" "$OUTPUT_DIR"
