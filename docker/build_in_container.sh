@@ -110,7 +110,7 @@ fi
 cmake -H"${LOCAL_REPO_DIR}" -B"${LOCAL_BUILD_DIR}" $_extra_options \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-cmake --build "${LOCAL_BUILD_DIR}" --config $BUILD_TYPE -- -j$_cpu_count
+cmake --build "${LOCAL_BUILD_DIR}" --config $BUILD_TYPE --clean-first -- -j$_cpu_count
 
 # Copy the output files to the output directory
 chmod -R u+rw $OUTPUT_DIR
