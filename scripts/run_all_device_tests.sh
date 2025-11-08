@@ -27,7 +27,7 @@ Behavior mirrors scripts/run_all_device_tests.ps1 using .sh helpers.
 EOF
 }
 
-while getopts ":pbtr:s:h" opt; do
+while getopts ":pbqtr:s:h" opt; do
     case $opt in
         p) push_to_device=1 ;;
         b) benchmarks_only=1 ;;
