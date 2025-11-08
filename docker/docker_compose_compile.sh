@@ -169,6 +169,7 @@ echo "output_dir: $_llama_cpp_output_dir"
 echo "build_platform: $_build_platform"
 echo "build_arch: $_build_arch"
 echo "build_type: $_build_type"
+echo "rebuild: $_rebuild"
 echo "disable_hexagon_and_qnn: $_disable_hexagon_and_qnn"
 echo "enable_hexagon_backend: $_enable_hexagon_backend"
 echo "hexagon_npu_only: $_hexagon_npu_only"
@@ -184,6 +185,7 @@ pushd "$_script_dir"
 export LLAMA_CPP_REPO=$_llama_cpp_repo_dir
 export OUTPUT_PATH=$_llama_cpp_output_dir
 export BUILD_TYPE=$_build_type
+export SHOULD_REBUILD=$_rebuild
 export HOST_USER_ID=$_user_id
 export TARGET_PLATFORM=$_build_platform
 export TARGET_ARCH=$_build_arch

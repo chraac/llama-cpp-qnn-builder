@@ -17,6 +17,7 @@ echo "TARGET_PLATFORM: $TARGET_PLATFORM"
 echo "TARGET_ARCH: $TARGET_ARCH"
 echo "ANDROID_API_LEVEL: $ANDROID_PLATFORM"
 echo "BUILD_TYPE: $BUILD_TYPE"
+echo "SHOULD_REBUILD: $SHOULD_REBUILD"
 echo "CPU_COUNT: $_cpu_count"
 echo "CMAKE_EXTRA_BUILD_OPTIONS: $CMAKE_EXTRA_BUILD_OPTIONS"
 
@@ -106,11 +107,18 @@ else
     fi
 fi
 
+_extra_build_options=""
+
+if [ "$SHOULD_REBUILD" -eq 1 ]; then
+    echo "Performing a clean rebuild"
+    _extra_build_options="${_extra_build_options} --clean-first"
+fi
+
 # Build llama
 cmake -H"${LOCAL_REPO_DIR}" -B"${LOCAL_BUILD_DIR}" $_extra_options \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
-cmake --build "${LOCAL_BUILD_DIR}" --config $BUILD_TYPE --clean-first -- -j$_cpu_count
+cmake --build "${LOCAL_BUILD_DIR}" --config $BUILD_TYPE ${_extra_build_options} -- -j$_cpu_count
 
 # Copy the output files to the output directory
 chmod -R u+rw $OUTPUT_DIR
