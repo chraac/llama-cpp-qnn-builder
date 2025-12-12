@@ -15,7 +15,7 @@ param (
     [string]$TokenCount = '512',
     
     [Alias('-l')]
-    [string]$LogFileName = "llama-cli-test-llama3-1b-q4k-hexagon-npu-release"
+    [string]$LogFileName = "llama-completion-test-llama3-1b-q4k-hexagon-npu-release"
 )
 
 $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -45,7 +45,7 @@ Write-Host "LogFilePath: $logFilePath"
 
 $deviceCommandString = "cd $deviceExecPath && "
 $deviceCommandString += "LLAMA_CACHE=$deviceExecPath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-$deviceCommandString += "./llama-cli $extraArgs -m '$deviceModelPath/$ModelName' --no-mmap -no-cnv -s 1234 -p '$prompt'"
+$deviceCommandString += "./llama-completion $extraArgs -m '$deviceModelPath/$ModelName' --no-mmap -no-cnv -s 1234 -p '$prompt'"
 
 # Clear logcat
 adb logcat -c

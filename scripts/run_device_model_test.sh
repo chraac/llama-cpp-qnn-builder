@@ -9,7 +9,7 @@ _should_push_to_device=0
 _flash_attn=0
 _max_tokens=512
 _extra_args="--ignore-eos --no-mmap -no-cnv -s 1234"
-_log_file_name="llama-cli-test-llama3-1b-q4k-hexagon-npu-release"
+_log_file_name="llama-completion-test-llama3-1b-q4k-hexagon-npu-release"
 _log_file_ext=".log"
 _log_file_path="$_script_path/../run_logs/${_log_file_name}$_log_file_ext"
 _logcat_output_path="$_script_path/../run_logs/${_log_file_name}.logcat$_log_file_ext"
@@ -70,10 +70,10 @@ echo "logcat_output_path: $_logcat_output_path"
 
 device_command_string="cd $_device_exec_path && "
 device_command_string+="LLAMA_CACHE=$_device_exec_path/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-device_command_string+="./llama-cli -m '$_device_model_path/${_model_name}' $_extra_args -p '$_prompt'"
+device_command_string+="./llama-completion -m '$_device_model_path/${_model_name}' $_extra_args -p '$_prompt'"
 
 adb logcat -c
-adb logcat -s 'adsprpc' 'llama-cli' >$_logcat_output_path 2>&1 &
+adb logcat -s 'adsprpc' 'llama-completion' >$_logcat_output_path 2>&1 &
 logcat_pid=$!
 
 adb shell $device_command_string >$_log_file_path 2>&1

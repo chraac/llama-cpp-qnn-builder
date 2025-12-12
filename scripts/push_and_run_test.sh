@@ -24,6 +24,7 @@ push_executable() {
 
 push_executable 'test-backend-ops'
 push_executable 'llama-cli'
+push_executable 'llama-completion'
 push_executable 'llama-bench'
 push_executable 'sysMonApp'
 
