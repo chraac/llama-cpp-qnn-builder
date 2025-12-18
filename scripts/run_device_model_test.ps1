@@ -45,7 +45,7 @@ Write-Host "LogFilePath: $logFilePath"
 
 $deviceCommandString = "cd $deviceExecPath && "
 $deviceCommandString += "LLAMA_CACHE=$deviceExecPath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-$deviceCommandString += "./llama-completion $extraArgs -m '$deviceModelPath/$ModelName' --fit off -no-cnv -s 1234 -p '$prompt'"
+$deviceCommandString += "./llama-completion $extraArgs -m '$deviceModelPath/$ModelName' --fit on -no-cnv -s 1234 -c 8192 -p '$prompt'"
 
 # Clear logcat
 adb logcat -c
