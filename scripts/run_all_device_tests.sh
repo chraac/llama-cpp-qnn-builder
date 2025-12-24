@@ -72,11 +72,13 @@ fi
 if [[ $test_only -eq 0 ]]; then
     # Compose log file names (may have a trailing dot if revision is empty, matching ps1 behavior)
     perf_log_name="test-backend-ops-perf-all.release.${backend_log_name}.${revision}"
-    model_test_log_name="llama-cli-test-llama3-1b-q4-${backend_log_name}-fa-512-release.${revision}"
+    llama_test_log_name="llama-completion-llama3-1b-q4-${backend_log_name}-512-release.${revision}"
+    qwen_test_log_name="llama-completion-qwen3-1.7b-q4-${backend_log_name}-512-release.${revision}"
     benchmark_log_name="llama-bench-batch-llama3-q4-${backend_log_name}-release-no8bit.${revision}"
     
     perf_log_name=$(prefix_if_needed "$perf_log_name")
-    model_test_log_name=$(prefix_if_needed "$model_test_log_name")
+    llama_test_log_name=$(prefix_if_needed "$llama_test_log_name")
+    qwen_test_log_name=$(prefix_if_needed "$qwen_test_log_name")
     benchmark_log_name=$(prefix_if_needed "$benchmark_log_name")
     
     echo "Running device performance tests and saving log to ${perf_log_name}"
@@ -84,11 +86,16 @@ if [[ $test_only -eq 0 ]]; then
     -e "perf -b ${backend_name}" \
     -l "${perf_log_name}"
     
-    echo "Running device model test and saving log to ${model_test_log_name}"
+    echo "Running device model test and saving log to ${llama_test_log_name}"
     "${_script_path}/run_device_model_test.sh" \
-    -f \
     -m "meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_0.gguf" \
-    -l "${model_test_log_name}" \
+    -l "${llama_test_log_name}" \
+    -t 512
+
+    echo "Running device model test and saving log to ${qwen_test_log_name}"
+    "${_script_path}/run_device_model_test.sh" \
+    -m "qwen3-1.7b-bf16-Q4_0.gguf" \
+    -l "${qwen_test_log_name}" \
     -t 512
     
     echo "Running device benchmarks and saving log to ${benchmark_log_name}"
