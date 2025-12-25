@@ -17,7 +17,7 @@ _enable_hexagon_backend=1
 _hexagon_npu_only=0
 _qnn_only=0
 _disable_hexagon_and_qnn=0
-_use_ggml_hexagon=0
+_enable_ggml_hexagon=1
 _enable_dequant=0
 _enable_profiler=0
 
@@ -91,8 +91,8 @@ while (("$#")); do
             _enable_dequant=1
             shift
         ;;
-        --use-ggml-hexagon)
-            _use_ggml_hexagon=1
+        --disable-ggml-hexagon)
+            _enable_ggml_hexagon=0
             shift
         ;;
         *) # preserve positional arguments
@@ -102,7 +102,7 @@ while (("$#")); do
     esac
 done
 
-if [ $_use_ggml_hexagon -eq 1 ]; then
+if [ $_enable_ggml_hexagon -eq 1 ]; then
     export GGML_HEXAGON=1
     export BUILD_HEXAGON_BACKEND=0
     export BUILD_HEXAGON_NPU_ONLY=0
@@ -174,6 +174,7 @@ echo "disable_hexagon_and_qnn: $_disable_hexagon_and_qnn"
 echo "enable_hexagon_backend: $_enable_hexagon_backend"
 echo "hexagon_npu_only: $_hexagon_npu_only"
 echo "qnn_only: $_qnn_only"
+echo "enable_ggml_hexagon: $_enable_ggml_hexagon"
 echo "enable_profiler: $_enable_profiler"
 echo "------------------------------------------------------------"
 
