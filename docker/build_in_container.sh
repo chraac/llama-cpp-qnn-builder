@@ -3,8 +3,8 @@
 _cpu_count="$(nproc)"
 
 LOCAL_BUILD_DIR='/llama_cpp_build'
+LOCAL_REPO_DIR='/mnt/llama_cpp_mount'
 
-echo "LOCAL_REPO_DIR: $LOCAL_REPO_DIR"
 echo "LOCAL_BUILD_DIR: $LOCAL_BUILD_DIR"
 echo "QNN_SDK_PATH: $QNN_SDK_PATH"
 echo "HEXAGON_SDK_PATH: $HEXAGON_SDK_PATH"
@@ -38,14 +38,10 @@ if [ ! -z "$HEXAGON_SDK_PATH" ]; then
 fi
 
 # Sync the source code from the mounted directory to the local directory
-mkdir -p $LOCAL_REPO_DIR
-chmod 777 $LOCAL_REPO_DIR
-cd $LOCAL_REPO_DIR
-rsync -au --delete --exclude='env' --exclude='run_server.sh' --exclude='build_*' --exclude='build' --exclude='*.gguf' --exclude='.vs*' --exclude='.git/objects*' /mnt/llama_cpp_mount/ ./
+
 git config --global --add safe.directory $LOCAL_REPO_DIR
 echo "compiling git revision: $(git rev-parse --short HEAD)"
 mkdir -p "${LOCAL_BUILD_DIR}"
-rm -rf "${LOCAL_BUILD_DIR}/*"
 cd "${LOCAL_BUILD_DIR}"
 set -e
 
@@ -112,10 +108,12 @@ _extra_build_options=""
 if [ "$SHOULD_REBUILD" -eq 1 ]; then
     echo "Performing a clean rebuild"
     _extra_build_options="${_extra_build_options} --clean-first"
+    rm -rf "${LOCAL_BUILD_DIR}/*"
+    rm -rf "${LOCAL_BUILD_DIR}/*.*"
 fi
 
 # Build llama
-cmake -S "${LOCAL_REPO_DIR}" -B"${LOCAL_BUILD_DIR}" $_extra_options \
+cmake -S "/mnt/llama_cpp_mount/" -B"${LOCAL_BUILD_DIR}" $_extra_options \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
 cmake --build "${LOCAL_BUILD_DIR}" --config $BUILD_TYPE ${_extra_build_options} -- -j$_cpu_count
