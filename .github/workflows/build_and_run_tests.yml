@@ -22,7 +22,7 @@ jobs:
           git submodule update --init --recursive --checkout
           git submodule update --recursive
       - name: Build Linux Debug
-        run: docker/docker_compose_compile.sh -r -d --build-linux-x64 --qnn-only
+        run: docker/docker_compose_compile.sh -r -d --build-linux-x64 --qnn-only --disable-ggml-hexagon
       - name: Run test-backend-ops cpu
         run: docker/docker_compose_run_test.sh -b cpu
   build-android-qnn:
@@ -38,9 +38,9 @@ jobs:
           git submodule update --init --recursive --checkout
           git submodule update --recursive
       - name: Build Debug
-        run: docker/docker_compose_compile.sh -r -d --qnn-only
+        run: docker/docker_compose_compile.sh -r -d --qnn-only --disable-ggml-hexagon
       - name: Build Release
-        run: docker/docker_compose_compile.sh -r --qnn-only
+        run: docker/docker_compose_compile.sh -r --qnn-only --disable-ggml-hexagon
   build-android-hexagon-npu:
     timeout-minutes: 20
     runs-on: ubuntu-latest
