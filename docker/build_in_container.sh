@@ -115,7 +115,7 @@ if [ "$SHOULD_REBUILD" -eq 1 ]; then
 fi
 
 # Build llama
-cmake -H"${LOCAL_REPO_DIR}" -B"${LOCAL_BUILD_DIR}" $_extra_options \
+cmake -S "${LOCAL_REPO_DIR}" -B"${LOCAL_BUILD_DIR}" $_extra_options \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE
 
 cmake --build "${LOCAL_BUILD_DIR}" --config $BUILD_TYPE ${_extra_build_options} -- -j$_cpu_count
