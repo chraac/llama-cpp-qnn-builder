@@ -103,4 +103,4 @@ repeat_cmd() {
 
 _script_dir="$(dirname "$(realpath "$0")")"
 _working_dir="$(pwd)"
-repeat_cmd "clear && $_script_dir/../docker/docker_compose_compile.sh --repo-dir '${_working_dir}' -r --use-ggml-hexagon -d"
+repeat_cmd "clear && $_script_dir/../docker/docker_compose_compile.sh --repo-dir '${_working_dir}' -r -d"
