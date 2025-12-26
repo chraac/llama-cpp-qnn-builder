@@ -41,6 +41,11 @@ fi
 
 git config --global --add safe.directory $LOCAL_REPO_DIR
 echo "compiling git revision: $(git rev-parse --short HEAD)"
+
+if [ "$SHOULD_REBUILD" -eq 1 ]; then
+    rm -rf "${LOCAL_BUILD_DIR}"
+fi
+
 mkdir -p "${LOCAL_BUILD_DIR}"
 cd "${LOCAL_BUILD_DIR}"
 set -e
@@ -108,8 +113,6 @@ _extra_build_options=""
 if [ "$SHOULD_REBUILD" -eq 1 ]; then
     echo "Performing a clean rebuild"
     _extra_build_options="${_extra_build_options} --clean-first"
-    rm -rf "${LOCAL_BUILD_DIR}/*"
-    rm -rf "${LOCAL_BUILD_DIR}/*.*"
 fi
 
 # Build llama
