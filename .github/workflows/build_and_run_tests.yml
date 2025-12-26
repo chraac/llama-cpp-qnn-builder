@@ -59,9 +59,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build Debug
-        run: docker/docker_compose_compile.sh -r -d --enable-dequant
+        run: docker/docker_compose_compile.sh -r -d --enable-dequant --hexagon-npu-only --disable-ggml-hexagon
       - name: Build Release
-        run: docker/docker_compose_compile.sh -r --hexagon-npu-only --enable-dequant
+        run: docker/docker_compose_compile.sh -r --hexagon-npu-only --enable-dequant --disable-ggml-hexagon
   build-windows-qnn:
     timeout-minutes: 20
     runs-on: windows-latest
