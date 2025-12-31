@@ -186,6 +186,8 @@ echo "hexagon_npu_only: $_hexagon_npu_only"
 echo "qnn_only: $_qnn_only"
 echo "enable_ggml_hexagon: $_enable_ggml_hexagon"
 echo "enable_profiler: $_enable_profiler"
+echo "enable_dequant: $_enable_dequant"
+echo "enable_ocl: $_enable_ocl"
 echo "------------------------------------------------------------"
 
 _start_time=$(date +%s)
