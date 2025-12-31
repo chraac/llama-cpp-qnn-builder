@@ -55,6 +55,7 @@ jobs:
           git submodule update --recursive
       - name: Free-up runner disk space # see: https://github.com/orgs/community/discussions/25678
         run: |
+          df -h
           rm -rf /opt/hostedtoolcache
           df -h
       - name: Build Debug
@@ -76,7 +77,6 @@ jobs:
       - name: Free-up runner disk space # see: https://github.com/orgs/community/discussions/25678
         run: |
           rm -rf /opt/hostedtoolcache
-          df -h
       - name: Build Debug
         run: docker/docker_compose_compile.sh -r -d
       - name: Build Release
