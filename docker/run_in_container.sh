@@ -7,6 +7,7 @@ echo "TEST_BACKEND: $TEST_BACKEND"
 cd $EXEC_MOUNT_POINT
 set -e
 
+export LD_LIBRARY_PATH="${EXEC_MOUNT_POINT}:${LD_LIBRARY_PATH}"
 if [ "$TEST_BACKEND" = "cpu" ] || [ "$TEST_BACKEND" = "all" ]; then
     ./test-backend-ops test -b qnn-cpu >$RUN_LOG_PATH/test-backend-ops-all-cpu.log 2>&1
 fi
