@@ -20,6 +20,7 @@ _disable_hexagon_and_qnn=0
 _enable_ggml_hexagon=1
 _enable_dequant=0
 _enable_profiler=0
+_enable_ocl=0
 
 # Parse command-line arguments
 while (("$#")); do
@@ -53,14 +54,14 @@ while (("$#")); do
             shift
         ;;
         --asan)
-            _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+            _build_options="${_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
             shift
         ;;
         --build-linux-x64)
             _build_platform='linux'
             _build_arch='x86_64'
             # disable the qnn cpu backend, let the test use ggml cpu backend to cross verify the results
-            _extra_build_options="${_extra_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
+            _build_options="${_build_options} -DLLAMA_SANITIZE_ADDRESS=on"
             shift
         ;;
         --perf-log)
@@ -95,6 +96,10 @@ while (("$#")); do
             _enable_ggml_hexagon=0
             shift
         ;;
+        --enable-ocl)
+            _enable_ocl=1
+            shift
+        ;;
         *) # preserve positional arguments
             echo "Invalid option $1"
             exit 1
@@ -124,17 +129,22 @@ else
     fi
 
     if [ $_enable_dequant -eq 1 ]; then
-        _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=on"
+        _build_options="${_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=on"
     else
-        _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=off"
+        _build_options="${_build_options} -DGGML_HEXAGON_ENABLE_QUANTIZED_TENSORS=off"
     fi
 
     if [ $_enable_profiler -eq 1 ]; then
-        _extra_build_options="${_extra_build_options} -DGGML_HEXAGON_ENABLE_PERFORMANCE_TRACKING=on"
+        _build_options="${_build_options} -DGGML_HEXAGON_ENABLE_PERFORMANCE_TRACKING=on"
     fi
     export GGML_HEXAGON=0
 fi
 
+if [ $_enable_ocl -eq 1 ]; then
+    _build_options="${_build_options} -DGGML_OPENCL=ON -DGGML_OPENCL_USE_ADRENO_KERNELS=ON"
+else
+    _build_options="${_build_options} -DGGML_OPENCL=OFF"
+fi
 
 _build_options="${_build_options} ${_extra_build_options}"
 
