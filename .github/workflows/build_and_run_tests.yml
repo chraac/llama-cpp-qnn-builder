@@ -53,11 +53,10 @@ jobs:
           git submodule foreach --recursive git reset --hard
           git submodule update --init --recursive --checkout
           git submodule update --recursive
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Free-up runner disk space # see: https://github.com/orgs/community/discussions/25678
+        run: |
+          rm -rf /opt/hostedtoolcache
+          df -h
       - name: Build Debug
         run: docker/docker_compose_compile.sh -r -d --enable-dequant --hexagon-npu-only --disable-ggml-hexagon
       - name: Build Release
@@ -74,11 +73,10 @@ jobs:
           git submodule foreach --recursive git reset --hard
           git submodule update --init --recursive --checkout
           git submodule update --recursive
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Free-up runner disk space # see: https://github.com/orgs/community/discussions/25678
+        run: |
+          rm -rf /opt/hostedtoolcache
+          df -h
       - name: Build Debug
         run: docker/docker_compose_compile.sh -r -d
       - name: Build Release

@@ -113,6 +113,7 @@ if [ $_enable_ggml_hexagon -eq 1 ]; then
     export BUILD_HEXAGON_NPU_ONLY=0
     _build_options="${_build_options} -DGGML_QNN_ENABLE_CPU_BACKEND=off -DGGML_OPENMP=off"
     _disable_hexagon_and_qnn=1
+    _enable_hexagon_backend=0
 else
     _build_options="${_build_options} -DGGML_QNN_ENABLE_CPU_BACKEND=on -DGGML_OPENMP=on"
     if [ $_enable_hexagon_backend -eq 1 ]; then
