@@ -14,7 +14,7 @@ $devicePath = '/data/local/tmp'
 $logFileExtension = ".log"
 $logFilePath = "$scriptPath/../run_logs/${LogFileName}${logFileExtension}"
 $logcatOutputPath = "$scriptPath/../run_logs/${LogFileName}_logcat${logFileExtension}"
-$extraRunVars = "LLAMA_CACHE=$devicePath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./"
+$extraRunVars = "GGML_HEXAGON_EXPERIMENTAL=1 LLAMA_CACHE=$devicePath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./"
 
 Write-Host "ExtraArgs: $ExtraArgs"
 Write-Host "LogFilePath: $logFilePath"
