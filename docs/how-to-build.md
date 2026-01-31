@@ -59,23 +59,27 @@ This guide describes how to build Android and Windows versions of the QNN backen
 | `--asan`                    |       | Enable AddressSanitizer                    | `false`             |
 | `--build-linux-x64`         |       | Build for Linux x86_64 platform            | `android arm64-v8a` |
 | `--perf-log`                |       | Enable Hexagon performance tracking        | `false`             |
-| `--enable-hexagon-backend`  |       | Enable Hexagon backend support             | `false`             |
+| `--enable-hexagon-backend`  |       | Enable Hexagon backend support             | `true`              |
+| `--disable-hexagon-backend` |       | Disable Hexagon backend support            | `false`             |
 | `--hexagon-npu-only`        |       | Build Hexagon NPU backend only             | `false`             |
 | `--disable-hexagon-and-qnn` |       | Disable both Hexagon and QNN backends      | `false`             |
 | `--qnn-only`                |       | Build QNN backend only                     | `false`             |
 | `--enable-dequant`          |       | Enable quantized tensor support in Hexagon | `false`             |
+| `--disable-ggml-hexagon`    |       | Disable ggml-hexagon backend               | `false`             |
+| `--run-tests`               |       | Run backend operation tests after build    | `false`             |
+| `--reset-submodules`        |       | Reset git submodules to clean state        | `false`             |
+| `--ci`                      |       | Run in CI mode                             | `false`             |
+| `--pull`                    |       | Pull latest Docker image before build      | `false`             |
+| `--enable-ocl`              |       | Enable OpenCL support (Adreno kernels)     | `false`             |
 
 ### Build Examples
 
 ```bash
-# Basic build (default: Release mode, QNN + Hexagon backends)
+# Basic build (default: Release mode, ggml-hexagon + QNN backends)
 ./docker/docker_compose_compile.sh
 
-# Debug build with Hexagon NPU backend
-./docker/docker_compose_compile.sh -d --enable-hexagon-backend
-
-# Debug build with Hexagon NPU backend only
-./docker/docker_compose_compile.sh -d --hexagon-npu-only
+# Debug build
+./docker/docker_compose_compile.sh -d
 
 # Debug build with Hexagon NPU backend and quantized tensor support
 ./docker/docker_compose_compile.sh -d --hexagon-npu-only --enable-dequant
@@ -83,8 +87,23 @@ This guide describes how to build Android and Windows versions of the QNN backen
 # QNN-only build with performance logging
 ./docker/docker_compose_compile.sh --qnn-only --perf-log
 
+# Disable ggml-hexagon, use QNN CPU backend instead
+./docker/docker_compose_compile.sh --disable-ggml-hexagon
+
+# Build with OpenCL support (Adreno kernels)
+./docker/docker_compose_compile.sh --enable-ocl
+
+# Pull latest Docker image before building
+./docker/docker_compose_compile.sh --pull
+
 # Force rebuild with debug symbols
 ./docker/docker_compose_compile.sh -r -d
+
+# Run backend tests after build (Linux x86_64)
+./docker/docker_compose_compile.sh --build-linux-x64 --run-tests
+
+# Disable all QNN/Hexagon backends (CPU only)
+./docker/docker_compose_compile.sh --disable-hexagon-and-qnn
 ```
 
 ### Hexagon SDK Setup
