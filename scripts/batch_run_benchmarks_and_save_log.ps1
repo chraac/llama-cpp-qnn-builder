@@ -19,9 +19,9 @@ $_scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $_devicePath = '/data/local/tmp'
 $_deviceModelPath = '/sdcard'
 $_modelList = @(
-    'meta-llama_Meta-Llama-3.2-1B-Instruct', 
-    'meta-llama_Meta-Llama-3.2-3B-Instruct', 
-    'meta-llama_Meta-Llama-3-8B-Instruct'
+    'qwen3.5-2b-bf16', 
+    'qwen3.5-4b-bf16', 
+    'qwen3.5-9b-bf16'
 )
 
 if ($PushToDevice) {
@@ -30,8 +30,8 @@ if ($PushToDevice) {
 
 if ($Skip8b) {
     $_modelList = @(
-        'meta-llama_Meta-Llama-3.2-1B-Instruct', 
-        'meta-llama_Meta-Llama-3.2-3B-Instruct'
+        'qwen3.5-2b-bf16-q4', 
+        'qwen3.5-4b-bf16-q4'
     )
 }
 
@@ -64,11 +64,7 @@ function Run-Benchmark {
 }
 
 foreach ($model in $_modelList) {
-    $_model_q4_0 = "$model-Q4_0.gguf"
+    $_model_q4_0 = "$model-q4.gguf"
     "Running benchmark for $_model_q4_0..." | Out-File -FilePath $logFilePath -Append
     Run-Benchmark -modelName $_model_q4_0 2>&1 | Out-File -FilePath $logFilePath -Append
-
-    $_model_q4_k_m = "$model-Q4_K_M.gguf"
-    "Running benchmark for $_model_q4_k_m..." | Out-File -FilePath $logFilePath -Append
-    Run-Benchmark -modelName $_model_q4_k_m 2>&1 | Out-File -FilePath $logFilePath -Append
 }
