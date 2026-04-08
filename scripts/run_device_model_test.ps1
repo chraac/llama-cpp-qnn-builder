@@ -7,6 +7,9 @@ param (
 
     [Alias('-p')]
     [switch]$PushToDevice,
+    
+    [Alias('-x')]
+    [switch]$ExtraPrompt = $false,
 
     [Alias('-f')]
     [switch]$FlashAttention,
@@ -22,6 +25,9 @@ $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
 $deviceExecPath = '/data/local/tmp'
 $deviceModelPath = '/sdcard'
 $prompt = 'I believe the meaning of life is'
+$promptLong = 'From an unlimited supply of 1-cent coins, 10-cent coins, and 25-cent coins, Silas wants to find a collection of coins that has a total value of $ N $ cents, where $ N $ is a positive integer. He uses the so-called **greedy algorithm**, successively choosing the coin of greatest value that does not cause the value of his collection to exceed $ N $. For example, to get 42 cents, Silas will choose a 25-cent coin, then a 10-cent coin, then 7 1-cent coins. However, this collection of 9 coins uses more coins than necessary to get a total of 42 cents; indeed, choosing 4 10-cent coins and 2 1-cent coins achieves the same total value with only 6 coins.
+In general, the greedy algorithm succeeds for a given $ N $ if no other collection of 1-cent, 10-cent, and 25-cent coins gives a total value of $ N $ cents using strictly fewer coins than the collection given by the greedy algorithm. Find the number of values of $ N $ between 1 and 1000 inclusive for which the greedy algorithm succeeds.
+Please reason step by step, and put your final answer within \boxed{}.'
 $logFileExtension = ".log"
 $logFilePath = "$scriptPath/../run_logs/${LogFileName}${logFileExtension}"
 $logcatOutputPath = "$scriptPath/../run_logs/${LogFileName}_logcat${logFileExtension}"
@@ -43,9 +49,16 @@ if ($FlashAttention) {
 Write-Host "ExtraArgs: $extraArgs"
 Write-Host "LogFilePath: $logFilePath"
 
+$promptString = ""
+if ($ExtraPrompt) {
+    $promptString = $promptLong
+} else {
+    $promptString = $prompt
+}
+
 $deviceCommandString = "cd $deviceExecPath && "
 $deviceCommandString += "LLAMA_CACHE=$deviceExecPath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-$deviceCommandString += "./llama-completion $extraArgs -m '$deviceModelPath/$ModelName' --fit on -no-cnv -s 1234 -c 4096 -p '$prompt'"
+$deviceCommandString += "./llama-completion $extraArgs -m '$deviceModelPath/$ModelName' --fit on -no-cnv -s 1234 -c 4096 -p '$promptString'"
 
 # Clear logcat
 adb logcat -c
