@@ -9,7 +9,7 @@ param (
     [switch]$PushToDevice,
     
     [Alias('-x')]
-    [switch]$ExtraPrompt = $false,
+    [switch]$ExtraPrompt,
 
     [Alias('-f')]
     [switch]$FlashAttention,
