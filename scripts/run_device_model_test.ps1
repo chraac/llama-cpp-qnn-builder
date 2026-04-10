@@ -8,7 +8,7 @@ param (
     [Alias('-p')]
     [switch]$PushToDevice,
     
-    [Alias('-x')]
+    [Alias('-e')]
     [switch]$ExtraPrompt,
 
     [Alias('-f')]
