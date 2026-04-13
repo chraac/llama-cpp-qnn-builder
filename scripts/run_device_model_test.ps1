@@ -57,7 +57,7 @@ if ($ExtraPrompt) {
 }
 
 $deviceCommandString = "cd $deviceExecPath && "
-$deviceCommandString += "LLAMA_CACHE=$deviceExecPath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
+$deviceCommandString += "GGML_HEXAGON_EXPERIMENTAL=1 LLAMA_CACHE=$deviceExecPath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
 $deviceCommandString += "./llama-completion $extraArgs -m '$deviceModelPath/$ModelName' --fit on -no-cnv -s 1234 -c 4096 -p '$promptString'"
 
 # Clear logcat
