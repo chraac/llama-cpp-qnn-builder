@@ -86,7 +86,7 @@ device_command_string+="GGML_HEXAGON_EXPERIMENTAL=1 LLAMA_CACHE=$_device_exec_pa
 device_command_string+="./llama-completion $extra_args -m '$_device_model_path/${_model_name}' --fit on -no-cnv -s 1234 -c 4096 -p '$_prompt_string'"
 
 adb logcat -c
-adb logcat -s "adsprpc|pid-" >$_logcat_output_path 2>&1 &
+adb logcat -s 'adsprpc' 'llama-completion' 'pid-' >$_logcat_output_path 2>&1 &
 logcat_pid=$!
 
 adb shell $device_command_string >$_log_file_path 2>&1
