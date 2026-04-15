@@ -12,7 +12,7 @@ _should_push_to_device=0
 _extra_prompt=0
 _flash_attn=0
 _max_tokens=512
-_extra_args="-n $_max_tokens --ignore-eos"
+_extra_args=""
 _log_file_name="llama-completion-test-llama3-1b-q4k-hexagon-npu-release"
 _log_file_ext=".log"
 _log_file_path="$_script_path/../run_logs/${_log_file_name}$_log_file_ext"
@@ -69,6 +69,8 @@ fi
 if [ $_flash_attn -eq 1 ]; then
     _extra_args="${_extra_args} --flash-attn on"
 fi
+
+_extra_args="${_extra_args} -n $_max_tokens --ignore-eos"
 
 echo "extra_args: $_extra_args"
 echo "log_file_name: $_log_file_name"
