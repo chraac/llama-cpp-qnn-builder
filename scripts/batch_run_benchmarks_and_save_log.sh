@@ -4,7 +4,7 @@ _script_path=$(dirname "$(realpath "$0")")
 _device_path='/data/local/tmp'
 _device_model_path='/sdcard'
 _log_file_name='llama-bench-batch-qnn-gpu-debug.log'
-_model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-3B-Instruct' 'meta-llama_Meta-Llama-3-8B-Instruct')
+_model_list=('qwen3.5-2b-bf16' 'qwen3.5-4b-bf16' 'qwen3.5-9b-bf16')
 _should_push_to_device=0
 _verbose_log=0
 _skip_8b_model=0
@@ -47,7 +47,7 @@ if [ $_should_push_to_device -eq 1 ]; then
 fi
 
 if [ $_skip_8b_model -eq 1 ]; then
-    _model_list=('meta-llama_Meta-Llama-3.2-1B-Instruct' 'meta-llama_Meta-Llama-3.2-3B-Instruct')
+    _model_list=('qwen3.5-2b-bf16' 'qwen3.5-4b-bf16')
 fi
 
 _extra_args=""
@@ -61,21 +61,20 @@ fi
 
 log_file_path="$_script_path/../run_logs/$_log_file_name"
 
+# Create logs directory if it doesn't exist
+log_dir=$(dirname "$log_file_path")
+mkdir -p "$log_dir"
+
 function run_benchmark() {
-    # adb shell 'cd /data/local/tmp/ && LLAMA_CACHE=/data/local/tmp/cache ./llama-bench --progress -v -mmp 0 -m meta-llama_Meta-Llama-3.2-1B-Instruct-f32.gguf' > llama-bench-f32-qnn-gpu-debug.log 2>&1
     local model_name=$1
     local command_string="cd $_device_path && "
     command_string+="LLAMA_CACHE=$_device_path/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-    command_string+="./llama-bench --progress ${_extra_args} -mmp 0 -p 512 -n 128 -m ${_device_model_path}/$model_name"
-    adb shell $command_string
+    command_string+="./llama-bench --progress ${_extra_args} -mmp 0 -r 10 -p 512 -n 128 -m ${_device_model_path}/$model_name"
+    adb shell "$command_string"
 }
 
 for model in "${_model_list[@]}"; do
-    _model_q4_0="${model}-Q4_0.gguf"
+    _model_q4_0="${model}-q4.gguf"
     echo "Running benchmark for $_model_q4_0..." >>$log_file_path 2>&1
-    run_benchmark $_model_q4_0 >>$log_file_path 2>&1
-
-    _model_q4_k_m="${model}-Q4_K_M.gguf"
-    echo "Running benchmark for $_model_q4_k_m..." >>$log_file_path 2>&1
-    run_benchmark $_model_q4_k_m >>$log_file_path 2>&1
+    run_benchmark "$_model_q4_0" >>$log_file_path 2>&1
 done

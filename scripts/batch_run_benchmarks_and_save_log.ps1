@@ -30,8 +30,8 @@ if ($PushToDevice) {
 
 if ($Skip8b) {
     $_modelList = @(
-        'qwen3.5-2b-bf16-q4', 
-        'qwen3.5-4b-bf16-q4'
+        'qwen3.5-2b-bf16', 
+        'qwen3.5-4b-bf16'
     )
 }
 
@@ -42,7 +42,7 @@ if ($Verbose) {
 
 if ($FlashAttention) {
     $extraArgs += " --flash-attn on"
-}
+}1
 
 $logFilePath = "$_scriptPath/../run_logs/$LogFileName"
 
@@ -59,7 +59,7 @@ function Run-Benchmark {
     
     $commandString = "cd $_devicePath && "
     $commandString += "LLAMA_CACHE=$_devicePath/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-    $commandString += "./llama-bench --progress ${extraArgs} -mmp 0 -p 512 -n 128 -m ${_deviceModelPath}/$modelName"
+    $commandString += "./llama-bench --progress ${extraArgs} -mmp 0 -r 10 -p 512 -n 128 -m ${_deviceModelPath}/$modelName"
     adb shell "$commandString"
 }
 
