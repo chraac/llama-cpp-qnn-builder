@@ -69,7 +69,7 @@ function run_benchmark() {
     local model_name=$1
     local command_string="cd $_device_path && "
     command_string+="LLAMA_CACHE=$_device_path/.cache LD_LIBRARY_PATH=./ ADSP_LIBRARY_PATH=./ "
-    command_string+="./llama-bench --progress ${_extra_args} -mmp 0 -r 10 -p 512 -n 128 -m ${_device_model_path}/$model_name"
+    command_string+="./llama-bench --progress ${_extra_args} -mmp 0 -r 20 -p 512 -n 128 -m ${_device_model_path}/$model_name"
     adb shell "$command_string"
 }
 
