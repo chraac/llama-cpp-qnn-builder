@@ -1,3 +1,5 @@
+
+
 # llama-cpp-qnn-builder
 
 Builder for llama.cpp with Qualcomm QNN (Qualcomm Neural Network) backend support, enabling efficient AI model inference on Snapdragon devices with Hexagon NPUs and Adreno GPUs.
@@ -45,7 +47,7 @@ Builder for llama.cpp with Qualcomm QNN (Qualcomm Neural Network) backend suppor
 ./scripts/run_all_device_tests.sh -p
 
 # Run a specific model
-./build_qnn_arm64-v8a/bin/main -m models/meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_0.gguf -p "Hello"
+./build_qnn_arm64-v8a/bin/llama-cli -m models/meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_0.gguf -p "Hello"
 ```
 
 ## Build Options
