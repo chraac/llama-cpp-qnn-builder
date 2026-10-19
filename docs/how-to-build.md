@@ -1,26 +1,31 @@
+# How to Build llama.cpp with QNN Backend
+
 This guide describes how to build Android and Windows versions of the QNN backend for llama.cpp, enabling efficient inference on Qualcomm hardware.
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
 - [Android Build](#android-build)
-  - [Android Prerequisites](#android-prerequisites)
-  - [Android Build Process](#android-build-process)
+  - [Prerequisites](#prerequisites)
+  - [Quick Build](#quick-build)
   - [Build Options](#build-options)
   - [Build Examples](#build-examples)
-  - [Hexagon SDK Setup](#hexagon-sdk-setup)
-    - [Prerequisites](#prerequisites)
-    - [Building the Hexagon SDK Image](#building-the-hexagon-sdk-image)
+  - [Build Output](#build-output)
+  - [Testing on Device](#testing-on-device)
+- [Hexagon SDK Setup](#hexagon-sdk-setup)
+  - [Prerequisites](#hexagon-sdk-prerequisites)
+  - [Building the Hexagon SDK Image](#building-the-hexagon-sdk-image)
 - [Windows Build](#windows-build)
-  - [Windows Prerequisites](#windows-prerequisites)
-  - [Windows Build Process](#windows-build-process)
-  - [Windows Build Output](#windows-build-output)
+  - [Prerequisites](#windows-prerequisites)
+  - [Build Process](#windows-build-process)
+  - [Build Output](#windows-build-output)
 - [Troubleshooting](#troubleshooting)
   - [Common Issues](#common-issues)
 
+---
+
 ## Android Build
 
-### Android Prerequisites
+### Prerequisites
 
 1. **Docker Engine**
    - Install following the [official Docker guide](https://docs.docker.com/engine/install/)
@@ -33,44 +38,45 @@ This guide describes how to build Android and Windows versions of the QNN backen
      cd llama-cpp-qnn-builder
      ```
 
+3. **Android Device (for testing)**
+   - Snapdragon device with NPU support (8 Gen 1+, 8cx Gen 3+, or similar)
+   - USB debugging enabled
+   - `adb` command available on host system
+
 > **Note**: Use the latest `main` branch as we're using NDK r27c with important optimization flags for Release builds.
 
-### Android Build Process
+### Quick Build
 
-1. **Basic Build**
-   - Navigate to the project root directory:
-     ```bash
-     ./docker/docker_compose_compile.sh
-     ```
+Navigate to the project root directory and run the build script:
 
-2. **Build Output**
-   - Executables will be in `build_qnn_arm64-v8a/bin/`
-   - The console will show build progress and completion status:
-   
-   ![Build Output](https://github.com/user-attachments/assets/101a97be-efdf-455d-9d3c-a593311e144a)
+```bash
+./docker/docker_compose_compile.sh
+```
+
+This builds with default settings (Release mode, ggml-hexagon + QNN backends).
 
 ### Build Options
 
-| Parameter                   | Short | Description                                | Default             |
-| --------------------------- | ----- | ------------------------------------------ | ------------------- |
-| `--rebuild`                 | `-r`  | Force rebuild of the project               | `false`             |
-| `--repo-dir`                |       | Specify llama.cpp repository directory     | `../llama.cpp`      |
-| `--debug`                   | `-d`  | Build in Debug mode                        | `Release`           |
-| `--asan`                    |       | Enable AddressSanitizer                    | `false`             |
-| `--build-linux-x64`         |       | Build for Linux x86_64 platform            | `android arm64-v8a` |
-| `--perf-log`                |       | Enable Hexagon performance tracking        | `false`             |
-| `--enable-hexagon-backend`  |       | Enable Hexagon backend support             | `true`              |
-| `--disable-hexagon-backend` |       | Disable Hexagon backend support            | `false`             |
-| `--hexagon-npu-only`        |       | Build Hexagon NPU backend only             | `false`             |
-| `--disable-hexagon-and-qnn` |       | Disable both Hexagon and QNN backends      | `false`             |
-| `--qnn-only`                |       | Build QNN backend only                     | `false`             |
-| `--enable-dequant`          |       | Enable quantized tensor support in Hexagon | `false`             |
-| `--disable-ggml-hexagon`    |       | Disable ggml-hexagon backend               | `false`             |
-| `--run-tests`               |       | Run backend operation tests after build    | `false`             |
-| `--reset-submodules`        |       | Reset git submodules to clean state        | `false`             |
-| `--ci`                      |       | Run in CI mode                             | `false`             |
-| `--pull`                    |       | Pull latest Docker image before build      | `false`             |
-| `--enable-ocl`              |       | Enable OpenCL support (Adreno kernels)     | `false`             |
+| Option                   | Short | Description                                      | Default             |
+| ------------------------ | ----- | ------------------------------------------------ | ------------------- |
+| `--rebuild`              | `-r`  | Force rebuild of the project                    | `false`             |
+| `--repo-dir`             |       | Specify llama.cpp repository directory          | `../llama.cpp`      |
+| `--debug`                | `-d`  | Build in Debug mode                             | `Release`           |
+| `--asan`                 |       | Enable AddressSanitizer                         | `false`             |
+| `--build-linux-x64`      |       | Build for Linux x86_64 platform                 | `android arm64-v8a` |
+| `--perf-log`             |       | Enable Hexagon performance tracking             | `false`             |
+| `--enable-hexagon-backend`|       | Enable Hexagon backend support                  | `true`              |
+| `--disable-hexagon-backend`|      | Disable Hexagon backend support                 | `false`             |
+| `--hexagon-npu-only`     |       | Build Hexagon NPU backend only                  | `false`             |
+| `--disable-hexagon-and-qnn`|     | Disable both Hexagon and QNN backends          | `false`             |
+| `--qnn-only`             |       | Build QNN backend only                           | `false`             |
+| `--enable-dequant`       |       | Enable quantized tensor support in Hexagon      | `false`             |
+| `--disable-ggml-hexagon` |       | Disable ggml-hexagon backend                    | `false`             |
+| `--run-tests`            |       | Run backend operation tests after build         | `false`             |
+| `--reset-submodules`     |       | Reset git submodules to clean state             | `false`             |
+| `--ci`                   |       | Run in CI mode                                  | `false`             |
+| `--pull`                 |       | Pull latest Docker image before build          | `false`             |
+| `--enable-ocl`           |       | Enable OpenCL support (Adreno kernels)          | `false`             |
 
 ### Build Examples
 
@@ -106,19 +112,75 @@ This guide describes how to build Android and Windows versions of the QNN backen
 ./docker/docker_compose_compile.sh --disable-hexagon-and-qnn
 ```
 
-### Hexagon SDK Setup
+### Build Output
+
+After successful build, executables will be in `build_qnn_arm64-v8a/bin/`:
+
+- `test-backend-ops` - Backend operation tests
+- `llama-cli` - Main inference executable
+- `llama-completion` - Text completion executable
+- `llama-bench` - Benchmarking tool
+- `sysMonApp` - System monitoring application
+- `*.so` - Shared library files for various backends
+
+### Testing on Device
+
+#### Push Binaries to Device
+
+```bash
+# Push binaries and run quick tests
+./scripts/push_and_run_test.sh
+
+# Push binaries only (no tests)
+./scripts/push_and_run_test.sh -p
+```
+
+#### Run All Device Tests
+
+```bash
+# Push to device and run full test suite
+./scripts/run_all_device_tests.sh -p
+
+# Run benchmarks only
+./scripts/run_all_device_tests.sh -p -b
+
+# Run tests only (skip perf/model/benchmarks)
+./scripts/run_all_device_tests.sh -p -t
+
+# Use hexagon-npu backend instead of HTP0
+./scripts/run_all_device_tests.sh -p -q
+```
+
+#### Run Specific Model Tests
+
+```bash
+# Run Llama 3.2 1B test with 512 tokens
+./scripts/run_device_model_test.sh \
+    -m "meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_0.gguf" \
+    -t 512
+
+# Run with verbose output and flash attention
+./scripts/run_device_model_test.sh \
+    -m "meta-llama_Meta-Llama-3.2-1B-Instruct-Q4_0.gguf" \
+    -v \
+    -f
+```
+
+---
+
+## Hexagon SDK Setup
 
 To build with Hexagon NPU backend support, you need to create a Docker image that includes the Hexagon SDK.
 
-#### Prerequisites
+### Hexagon SDK Prerequisites
 
 1. **Base Docker Image**
    - Required image: `chraac/llama-cpp-qnn-builder:2.36.0.250627-ndk-r27`
    - Contains Android NDK r27c and build tools
 
-#### Building the Hexagon SDK Image
+### Building the Hexagon SDK Image
 
-Now you can add the Hexagon SDK (community edition) url to your docker image directly.
+You can add the Hexagon SDK (community edition) URL to your docker image directly.
 
 1. **Create Dockerfile** (save as `Dockerfile.hexagon_sdk.local`):
 
@@ -153,7 +215,7 @@ Now you can add the Hexagon SDK (community edition) url to your docker image dir
    RUN unzip -o /tmp/Hexagon_SDK.zip -d ${HEXAGON_SDK_BASE}/../ && \
       rm -rf ${HEXAGON_SDK_BASE}/${HEXAGON_SDK_VERSION}/tools/android-ndk-*
 
-   # Dummy version info for hexagon-sdk 
+   # Dummy version info for hexagon-sdk
    RUN echo 'VERSION_ID="20.04"' > /etc/os-release
    ```
 
@@ -206,17 +268,19 @@ Now you can add the Hexagon SDK (community edition) url to your docker image dir
    ```bash
    # Enable Hexagon NPU backend
    ./docker/docker_compose_compile.sh --enable-hexagon-backend
-   
+
    # Or build with Hexagon NPU backend only
    ./docker/docker_compose_compile.sh --hexagon-npu-only
-   
+
    # Access container shell for manual builds
    docker-compose -f docker-compose.hexagon.yml run --rm hexagon-builder bash
    ```
 
+---
+
 ## Windows Build
 
-### Windows Prerequisites
+### Prerequisites
 
 1. **Qualcomm AI Engine Direct SDK**
    - Download from [Qualcomm Developer Portal](https://www.qualcomm.com/developer/software/qualcomm-ai-engine-direct-sdk)
@@ -226,7 +290,7 @@ Now you can add the Hexagon SDK (community edition) url to your docker image dir
    - Required components:
      - **Clang toolchain** for ARM64 compilation
        ![VS2022 Clang Installation](https://github.com/user-attachments/assets/30ee11f7-9069-4793-856d-c64bcd5d563b)
-     
+
      - **CMake tools** for Visual Studio
        ![VS2022 CMake Installation](https://github.com/user-attachments/assets/9a36dde5-0e41-4421-9161-e9b09cd32eb1)
 
@@ -236,7 +300,7 @@ Now you can add the Hexagon SDK (community edition) url to your docker image dir
    - Use QPM to install the Hexagon SDK
    - Set environment variable `HEXAGON_SDK_ROOT` to your installation directory
 
-### Windows Build Process
+### Build Process
 
 1. **Open Project**
    - Launch Visual Studio 2022
@@ -245,12 +309,12 @@ Now you can add the Hexagon SDK (community edition) url to your docker image dir
    - Select `CMakeLists.txt` in the llama.cpp root directory
 
 2. **Configure CMake**
-   
+
    Edit `llama.cpp/CMakePresets.json` to modify the `arm64-windows-llvm` configuration:
 
    ```diff
    {
-       "name": "arm64-windows-llvm", 
+       "name": "arm64-windows-llvm",
        "hidden": true,
        "architecture": { "value": "arm64", "strategy": "external" },
        "toolset": { "value": "host=x64", "strategy": "external" },
@@ -268,20 +332,22 @@ Now you can add the Hexagon SDK (community edition) url to your docker image dir
 
 3. **Select Configuration**
    - Choose `arm64-windows-llvm-debug` configuration from the dropdown menu
-   
+
    ![Configuration Selection](https://github.com/user-attachments/assets/be4afbc8-78be-457d-9498-53fb7ec43578)
 
 4. **Build**
    - Select `Build` → `Build All`
    - Output will be in `build-arm64-windows-llvm-debug/bin/`
 
-### Windows Build Output
+### Build Output
 
 After successful compilation, you'll have these executables:
 
 - `llama-cli.exe` - Main inference executable
 - `llama-bench.exe` - Benchmarking tool
 - `test-backend-ops.exe` - Backend operation tests
+
+---
 
 ## Troubleshooting
 
@@ -303,3 +369,12 @@ After successful compilation, you'll have these executables:
      ```bash
      docker-compose -f docker-compose.hexagon.yml logs
      ```
+
+4. **ADB Connection Issues**
+   - Ensure USB debugging is enabled on the device
+   - Check device connection with `adb devices`
+   - Some devices require authorization popup when connecting via ADB
+
+5. **NDK Version Issues**
+   - Ensure you're using NDK r27c for optimal performance with Release builds
+   - Use the `--pull` option to get the latest Docker image with updated NDK
